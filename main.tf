@@ -38,7 +38,6 @@ module "ecs" {
   app_image         = var.app_image
   worker_image      = var.worker_image
   app_env           = var.app_env
-  coc_api_token     = var.coc_api_token
   db_endpoint       = module.rds.db_endpoint
   db_password       = var.db_password
 }
@@ -61,4 +60,5 @@ module "static_instance" {
   image       = var.static_ip_image
   db_endpoint = module.rds.db_endpoint
   db_password = var.db_password
+  coc_api_token = var.coc_api_token
 }

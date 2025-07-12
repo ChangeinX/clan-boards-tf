@@ -8,7 +8,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `ecs` sets up the ECS cluster, task definition and service, CloudWatch log groups and Secrets Manager entries
 - `static_instance` runs a small EC2 instance with a fixed IP for the Clash of Clans API
 
-Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager.
+Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager. The Clash of Clans API token is supplied to the static instance rather than the worker.
 
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:

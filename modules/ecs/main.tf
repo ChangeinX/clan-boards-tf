@@ -72,14 +72,6 @@ resource "aws_secretsmanager_secret_version" "app_env" {
   secret_string = var.app_env
 }
 
-resource "aws_secretsmanager_secret" "coc_api_token" {
-  name = "${var.app_name}-coc-token"
-}
-
-resource "aws_secretsmanager_secret_version" "coc_api_token" {
-  secret_id     = aws_secretsmanager_secret.coc_api_token.id
-  secret_string = var.coc_api_token
-}
 
 resource "random_password" "secret_key" {
   length  = 32
@@ -101,7 +93,7 @@ resource "aws_secretsmanager_secret" "database_url" {
 
 resource "aws_secretsmanager_secret_version" "database_url" {
   secret_id     = aws_secretsmanager_secret.database_url.id
-  secret_string = "postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
+  secret_string = "postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
 }
 
 resource "aws_iam_role_policy" "execution_secrets" {
@@ -115,7 +107,6 @@ resource "aws_iam_role_policy" "execution_secrets" {
       Action = ["secretsmanager:GetSecretValue"],
       Resource = [
         aws_secretsmanager_secret.app_env.arn,
-        aws_secretsmanager_secret.coc_api_token.arn,
         aws_secretsmanager_secret.database_url.arn,
         aws_secretsmanager_secret.secret_key.arn
       ]
@@ -179,10 +170,6 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "APP_ENV"
           valueFrom = aws_secretsmanager_secret.app_env.arn
-        },
-        {
-          name      = "COC_API_TOKEN"
-          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
         },
         {
           name      = "DATABASE_URL"
