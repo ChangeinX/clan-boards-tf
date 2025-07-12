@@ -32,6 +32,20 @@ resource "aws_security_group" "this" {
   }
 
   egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
@@ -59,6 +73,11 @@ resource "aws_iam_role_policy_attachment" "ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "ecr" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 resource "aws_iam_instance_profile" "this" {
   role = aws_iam_role.this.name
 }
@@ -84,12 +103,15 @@ resource "aws_instance" "this" {
   user_data = <<-EOT
               #!/bin/bash
               set +H
-              sudo yum install -y docker
+              sudo yum install -y docker awscli
               sudo systemctl enable --now docker
               unset DOCKER_HOST
+              ECR_REGISTRY=$(echo '${var.image}' | cut -d/ -f1)
+              ECR_REGION=$(echo "$ECR_REGISTRY" | cut -d. -f4)
+              aws ecr get-login-password --region $ECR_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
               sudo docker run -d --restart=always --name ${var.app_name}-static \
                 -e COC_API_TOKEN='${var.coc_api_token}' \
-                -e DATABASE_URL='postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
+                -e DATABASE_URL='postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
                 ${var.image}
               set -H
               EOT

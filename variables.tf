@@ -38,6 +38,11 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "db_allowed_ip" {
+  description = "CIDR allowed to remotely connect to the database"
+  type        = string
+}
+
 variable "certificate_arn" {
   description = "ACM certificate ARN for HTTPS"
   type        = string
