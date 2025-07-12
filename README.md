@@ -10,6 +10,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - Fargate service behind the ALB running on ARM64
 - PostgreSQL RDS instance in private subnets with deletion protection
 - Separate CloudWatch log groups for each container
+- Secrets Manager stores worker environment variables
 
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:
@@ -19,7 +20,12 @@ app_image    = "<app image>"
 worker_image = "<worker image>"
 db_password  = "<strong password>"
 certificate_arn = "<acm certificate arn>"
+app_env = "production"
+coc_api_token = "<clash of clans api token>"
 ```
+
+The configuration stores these values in AWS Secrets Manager and generates a
+random `SECRET_KEY` for the worker container.
 
 2. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
 

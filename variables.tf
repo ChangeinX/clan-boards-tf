@@ -20,6 +20,18 @@ variable "worker_image" {
   type        = string
 }
 
+variable "app_env" {
+  description = "Environment for the worker container"
+  type        = string
+  default     = "production"
+}
+
+variable "coc_api_token" {
+  description = "API token for Clash of Clans"
+  type        = string
+  sensitive   = true
+}
+
 variable "db_password" {
   description = "Password for the postgres database"
   type        = string

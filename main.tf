@@ -238,6 +238,67 @@ resource "aws_iam_role_policy_attachment" "task_db_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
+# Secrets for worker container environment
+resource "aws_secretsmanager_secret" "app_env" {
+  name = "${var.app_name}-app-env"
+}
+
+resource "aws_secretsmanager_secret_version" "app_env" {
+  secret_id     = aws_secretsmanager_secret.app_env.id
+  secret_string = var.app_env
+}
+
+resource "aws_secretsmanager_secret" "coc_api_token" {
+  name = "${var.app_name}-coc-token"
+}
+
+resource "aws_secretsmanager_secret_version" "coc_api_token" {
+  secret_id     = aws_secretsmanager_secret.coc_api_token.id
+  secret_string = var.coc_api_token
+}
+
+resource "random_password" "secret_key" {
+  length  = 32
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "secret_key" {
+  name = "${var.app_name}-secret-key"
+}
+
+resource "aws_secretsmanager_secret_version" "secret_key" {
+  secret_id     = aws_secretsmanager_secret.secret_key.id
+  secret_string = random_password.secret_key.result
+}
+
+resource "aws_secretsmanager_secret" "database_url" {
+  name = "${var.app_name}-db-url"
+}
+
+resource "aws_secretsmanager_secret_version" "database_url" {
+  secret_id     = aws_secretsmanager_secret.database_url.id
+  secret_string = "postgres://postgres:${var.db_password}@${aws_db_instance.postgres.address}:5432/postgres"
+}
+
+resource "aws_iam_role_policy" "execution_secrets" {
+  name = "${var.app_name}-execution-secrets"
+  role = aws_iam_role.task_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = ["secretsmanager:GetSecretValue"],
+      Resource = [
+        aws_secretsmanager_secret.app_env.arn,
+        aws_secretsmanager_secret.coc_api_token.arn,
+        aws_secretsmanager_secret.database_url.arn,
+        aws_secretsmanager_secret.secret_key.arn
+      ]
+    }]
+  })
+}
+
 # Log groups for container logs
 resource "aws_cloudwatch_log_group" "app" {
   name = "/ecs/${var.app_name}-app"
@@ -313,6 +374,24 @@ resource "aws_ecs_task_definition" "app" {
           awslogs-stream-prefix = "worker"
         }
       }
+      secrets = [
+        {
+          name      = "APP_ENV"
+          valueFrom = aws_secretsmanager_secret.app_env.arn
+        },
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = aws_secretsmanager_secret.database_url.arn
+        },
+        {
+          name      = "SECRET_KEY"
+          valueFrom = aws_secretsmanager_secret.secret_key.arn
+        }
+      ]
     }
   ])
 }
