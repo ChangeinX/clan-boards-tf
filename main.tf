@@ -31,6 +31,18 @@ resource "aws_subnet" "public_b" {
   map_public_ip_on_launch = true
 }
 
+resource "aws_subnet" "private_a" {
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = "10.0.11.0/24"
+  availability_zone = "${var.region}a"
+}
+
+resource "aws_subnet" "private_b" {
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = "10.0.12.0/24"
+  availability_zone = "${var.region}b"
+}
+
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.this.id
 }
@@ -53,6 +65,20 @@ resource "aws_route_table_association" "public_a" {
 resource "aws_route_table_association" "public_b" {
   subnet_id      = aws_subnet.public_b.id
   route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.this.id
+}
+
+resource "aws_route_table_association" "private_a" {
+  subnet_id      = aws_subnet.private_a.id
+  route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "private_b" {
+  subnet_id      = aws_subnet.private_b.id
+  route_table_id = aws_route_table.private.id
 }
 
 # Security groups
@@ -126,7 +152,7 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "app" {
-  name     = "${var.app_name}-tg"
+  name        = "${var.app_name}-tg"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.this.id
@@ -141,6 +167,23 @@ resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.certificate_arn
 
   default_action {
     type             = "forward"
@@ -191,36 +234,41 @@ resource "aws_iam_role_policy_attachment" "task_db_policy" {
 # RDS Postgres
 resource "aws_db_subnet_group" "postgres" {
   name       = "${var.app_name}-db-subnet"
-  subnet_ids = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier              = "${var.app_name}-db"
-  engine                  = "postgres"
-  instance_class          = "db.t3.micro"
-  username                = "postgres"
-  password                = var.db_password
-  allocated_storage       = 20
-  db_subnet_group_name    = aws_db_subnet_group.postgres.name
-  vpc_security_group_ids  = [aws_security_group.rds.id]
-  skip_final_snapshot     = true
+  identifier             = "${var.app_name}-db"
+  engine                 = "postgres"
+  instance_class         = "db.t3.micro"
+  username               = "postgres"
+  password               = var.db_password
+  allocated_storage      = 20
+  db_subnet_group_name   = aws_db_subnet_group.postgres.name
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  deletion_protection    = true
+  skip_final_snapshot    = false
 }
 
 # Task definition with two containers
 resource "aws_ecs_task_definition" "app" {
-  family                   = "${var.app_name}"
+  family                   = var.app_name
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
 
   execution_role_arn = aws_iam_role.task_execution.arn
   task_role_arn      = aws_iam_role.task_with_db.arn
 
   container_definitions = jsonencode([
     {
-      name  = "app"
-      image = var.app_image
+      name      = "app"
+      image     = var.app_image
       essential = true
       portMappings = [
         {
@@ -230,8 +278,8 @@ resource "aws_ecs_task_definition" "app" {
       ]
     },
     {
-      name  = "worker"
-      image = var.worker_image
+      name      = "worker"
+      image     = var.worker_image
       essential = false
     }
   ])
@@ -244,8 +292,8 @@ resource "aws_ecs_service" "app" {
   desired_count   = 1
   launch_type     = "FARGATE"
   network_configuration {
-    subnets         = [aws_subnet.public_a.id, aws_subnet.public_b.id]
-    security_groups = [aws_security_group.ecs.id]
+    subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+    security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
   }
   load_balancer {
@@ -253,6 +301,6 @@ resource "aws_ecs_service" "app" {
     container_name   = "app"
     container_port   = 80
   }
-  depends_on = [aws_lb_listener.http]
+  depends_on = [aws_lb_listener.https]
 }
 
