@@ -84,13 +84,20 @@ resource "aws_route_table_association" "private_b" {
 # Security groups
 resource "aws_security_group" "alb" {
   name        = "${var.app_name}-alb-sg"
-  description = "Allow HTTP inbound"
+  description = "Allow HTTP/HTTPS inbound"
   vpc_id      = aws_vpc.this.id
 
   ingress {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -231,6 +238,15 @@ resource "aws_iam_role_policy_attachment" "task_db_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
+# Log groups for container logs
+resource "aws_cloudwatch_log_group" "app" {
+  name = "/ecs/${var.app_name}-app"
+}
+
+resource "aws_cloudwatch_log_group" "worker" {
+  name = "/ecs/${var.app_name}-worker"
+}
+
 # RDS Postgres
 resource "aws_db_subnet_group" "postgres" {
   name       = "${var.app_name}-db-subnet"
@@ -276,11 +292,27 @@ resource "aws_ecs_task_definition" "app" {
           hostPort      = 80
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.app.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "app"
+        }
+      }
     },
     {
       name      = "worker"
       image     = var.worker_image
       essential = false
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.worker.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "worker"
+        }
+      }
     }
   ])
 }
