@@ -107,7 +107,8 @@ resource "aws_instance" "this" {
               sudo systemctl enable --now docker
               unset DOCKER_HOST
               ECR_REGISTRY=$(echo '${var.image}' | cut -d/ -f1)
-              aws ecr get-login-password --region ${var.region} | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
+              ECR_REGION=$(echo "$ECR_REGISTRY" | cut -d. -f4)
+              aws ecr get-login-password --region $ECR_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
               sudo docker run -d --restart=always --name ${var.app_name}-static \
                 -e COC_API_TOKEN='${var.coc_api_token}' \
                 -e DATABASE_URL='postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \

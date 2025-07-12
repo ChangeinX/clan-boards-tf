@@ -41,6 +41,10 @@ resource "aws_security_group" "remote" {
 resource "aws_db_subnet_group" "postgres" {
   name       = "${var.app_name}-db-subnet"
   subnet_ids = var.private_subnet_ids
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_instance" "postgres" {
