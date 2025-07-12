@@ -41,7 +41,7 @@ resource "aws_instance" "this" {
               amazon-linux-extras install docker -y
               service docker start
               docker run -d --restart=always \
-                -e DATABASE_URL=postgres://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres \
+                -e DATABASE_URL=postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres \
                 ${var.image}
               EOT
 }
