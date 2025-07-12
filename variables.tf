@@ -42,3 +42,8 @@ variable "certificate_arn" {
   description = "ACM certificate ARN for HTTPS"
   type        = string
 }
+
+variable "static_ip_image" {
+  description = "Docker image for the static IP worker"
+  type        = string
+}

@@ -51,3 +51,14 @@ module "rds" {
   vpc_cidr           = module.networking.vpc_cidr
   db_password        = var.db_password
 }
+
+module "static_instance" {
+  source      = "./modules/static_instance"
+  app_name    = var.app_name
+  vpc_id      = module.networking.vpc_id
+  subnet_id   = module.networking.public_subnet_ids[0]
+  rds_sg_id   = module.rds.rds_sg_id
+  image       = var.static_ip_image
+  db_endpoint = module.rds.db_endpoint
+  db_password = var.db_password
+}
