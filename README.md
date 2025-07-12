@@ -6,7 +6,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
 - `ecs` sets up the ECS cluster, task definition and service, CloudWatch log groups and Secrets Manager entries
-- `static_instance` runs a small EC2 instance with a fixed IP for the Clash of Clans API
+- `static_instance` runs a small EC2 instance with a fixed IP for the Clash of Clans API. The Docker container is started as `${app_name}-static` so you can view logs with `sudo docker logs ${app_name}-static -f`.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager. The Clash of Clans API token is supplied to the static instance rather than the worker.
 

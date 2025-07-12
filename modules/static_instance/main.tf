@@ -78,12 +78,15 @@ resource "aws_instance" "this" {
 
   user_data = <<-EOT
               #!/bin/bash
+              set +H
               sudo yum install -y docker
               sudo systemctl enable --now docker
-              sudo docker run -d --restart=always \
+              unset DOCKER_HOST
+              sudo docker run -d --restart=always --name ${var.app_name}-static \
                 -e COC_API_TOKEN='${var.coc_api_token}' \
                 -e DATABASE_URL='postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
                 ${var.image}
+              set -H
               EOT
 }
 
