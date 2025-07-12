@@ -127,9 +127,10 @@ resource "aws_lb" "this" {
 
 resource "aws_lb_target_group" "app" {
   name     = "${var.app_name}-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.this.id
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.this.id
+  target_type = "ip"
 
   health_check {
     path = "/"
@@ -199,6 +200,7 @@ resource "aws_db_instance" "postgres" {
   instance_class          = "db.t3.micro"
   username                = "postgres"
   password                = var.db_password
+  allocated_storage       = 20
   db_subnet_group_name    = aws_db_subnet_group.postgres.name
   vpc_security_group_ids  = [aws_security_group.rds.id]
   skip_final_snapshot     = true
