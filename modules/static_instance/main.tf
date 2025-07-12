@@ -59,6 +59,11 @@ resource "aws_iam_role_policy_attachment" "ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "ecr" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 resource "aws_iam_instance_profile" "this" {
   role = aws_iam_role.this.name
 }
@@ -84,9 +89,11 @@ resource "aws_instance" "this" {
   user_data = <<-EOT
               #!/bin/bash
               set +H
-              sudo yum install -y docker
+              sudo yum install -y docker awscli
               sudo systemctl enable --now docker
               unset DOCKER_HOST
+              ECR_REGISTRY=$(echo '${var.image}' | cut -d/ -f1)
+              aws ecr get-login-password --region ${var.region} | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
               sudo docker run -d --restart=always --name ${var.app_name}-static \
                 -e COC_API_TOKEN='${var.coc_api_token}' \
                 -e DATABASE_URL='postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
