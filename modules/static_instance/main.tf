@@ -72,13 +72,17 @@ resource "aws_instance" "this" {
   key_name                    = var.key_name
   associate_public_ip_address = true
 
+  root_block_device {
+    volume_size = 16
+  }
+
   user_data = <<-EOT
               #!/bin/bash
-              yum install -y docker
-              systemctl enable --now docker
-              docker run -d --restart=always \
-                -e COC_API_TOKEN=${var.coc_api_token} \
-                -e DATABASE_URL=postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres \
+              sudo yum install -y docker
+              sudo systemctl enable --now docker
+              sudo docker run -d --restart=always \
+                -e COC_API_TOKEN='${var.coc_api_token}' \
+                -e DATABASE_URL='postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
                 ${var.image}
               EOT
 }
