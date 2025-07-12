@@ -49,19 +49,20 @@ module "rds" {
   private_subnet_ids = module.networking.private_subnet_ids
   vpc_cidr           = module.networking.vpc_cidr
   db_password        = var.db_password
+  allowed_ip         = var.db_allowed_ip
 }
 
 module "static_instance" {
-  source      = "./modules/static_instance"
-  app_name    = var.app_name
-  vpc_id      = module.networking.vpc_id
-  subnet_id   = module.networking.public_subnet_ids[0]
-  rds_sg_id   = module.rds.rds_sg_id
-  image       = var.static_ip_image
-  db_endpoint = module.rds.db_endpoint
-  db_password = var.db_password
+  source        = "./modules/static_instance"
+  app_name      = var.app_name
+  vpc_id        = module.networking.vpc_id
+  subnet_id     = module.networking.public_subnet_ids[0]
+  rds_sg_id     = module.rds.rds_sg_id
+  image         = var.static_ip_image
+  db_endpoint   = module.rds.db_endpoint
+  db_password   = var.db_password
   coc_api_token = var.coc_api_token
-  allowed_ip   = var.static_ip_allowed_ip
-  key_name     = var.static_ip_key_name
-  region       = var.region
+  allowed_ip    = var.static_ip_allowed_ip
+  key_name      = var.static_ip_key_name
+  region        = var.region
 }

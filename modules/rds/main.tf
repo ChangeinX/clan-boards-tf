@@ -18,6 +18,26 @@ resource "aws_security_group" "rds" {
   }
 }
 
+resource "aws_security_group" "remote" {
+  name        = "${var.app_name}-rds-remote-sg"
+  description = "Allow remote access to RDS"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 5432
+    to_port     = 5432
+    cidr_blocks = [var.allowed_ip]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_db_subnet_group" "postgres" {
   name       = "${var.app_name}-db-subnet"
   subnet_ids = var.private_subnet_ids
@@ -31,7 +51,7 @@ resource "aws_db_instance" "postgres" {
   password               = var.db_password
   allocated_storage      = 20
   db_subnet_group_name   = aws_db_subnet_group.postgres.name
-  vpc_security_group_ids = [aws_security_group.rds.id]
+  vpc_security_group_ids = [aws_security_group.rds.id, aws_security_group.remote.id]
   deletion_protection    = true
   skip_final_snapshot    = false
 }
