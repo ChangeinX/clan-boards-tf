@@ -39,8 +39,10 @@ resource "aws_security_group" "remote" {
 }
 
 resource "aws_db_subnet_group" "postgres" {
-  name       = "${var.app_name}-db-subnet"
-  subnet_ids = var.private_subnet_ids
+  name_prefix = "${var.app_name}-db-subnet-"
+
+  description = "Subnet group for the ${var.app_name} Postgres DB"
+  subnet_ids  = var.private_subnet_ids
 
   lifecycle {
     create_before_destroy = true
@@ -48,7 +50,7 @@ resource "aws_db_subnet_group" "postgres" {
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier             = "${var.app_name}-db"
+  identifier_prefix = "${var.app_name}-db-"
   engine                 = "postgres"
   instance_class         = "db.t3.micro"
   username               = "postgres"
@@ -58,5 +60,12 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.rds.id, aws_security_group.remote.id]
   publicly_accessible    = true
   deletion_protection    = true
-  skip_final_snapshot    = false
+  skip_final_snapshot    = true
+
+  lifecycle {
+    create_before_destroy = true
+    replace_triggered_by  = [
+      aws_db_subnet_group.postgres 
+    ]
+  }
 }
