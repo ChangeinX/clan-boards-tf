@@ -42,3 +42,19 @@ variable "certificate_arn" {
   description = "ACM certificate ARN for HTTPS"
   type        = string
 }
+
+variable "static_ip_image" {
+  description = "Docker image for the static IP worker"
+  type        = string
+}
+
+variable "static_ip_allowed_ip" {
+  description = "CIDR allowed to access the static instance"
+  type        = string
+}
+
+variable "static_ip_key_name" {
+  description = "EC2 key pair name for SSH access to the static instance"
+  type        = string
+  default     = null
+}
