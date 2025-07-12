@@ -39,11 +39,37 @@ resource "aws_security_group" "this" {
   }
 }
 
+data "aws_iam_policy_document" "assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "this" {
+  name               = "${var.app_name}-static-instance"
+  assume_role_policy = data.aws_iam_policy_document.assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "this" {
+  role = aws_iam_role.this.name
+}
+
 resource "aws_instance" "this" {
   ami                         = data.aws_ami.al2023_arm.id
   instance_type               = "t4g.micro"
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.this.id]
+  iam_instance_profile        = aws_iam_instance_profile.this.name
+  key_name                    = var.key_name
   associate_public_ip_address = true
 
   user_data = <<-EOT

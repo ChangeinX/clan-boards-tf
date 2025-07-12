@@ -62,4 +62,5 @@ module "static_instance" {
   db_password = var.db_password
   coc_api_token = var.coc_api_token
   allowed_ip   = var.static_ip_allowed_ip
+  key_name     = var.static_ip_key_name
 }

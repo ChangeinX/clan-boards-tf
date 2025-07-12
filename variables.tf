@@ -52,3 +52,9 @@ variable "static_ip_allowed_ip" {
   description = "CIDR allowed to access the static instance"
   type        = string
 }
+
+variable "static_ip_key_name" {
+  description = "EC2 key pair name for SSH access to the static instance"
+  type        = string
+  default     = null
+}
