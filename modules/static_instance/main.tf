@@ -74,12 +74,11 @@ resource "aws_instance" "this" {
 
   user_data = <<-EOT
               #!/bin/bash
-              yum update -y
-              amazon-linux-extras install docker -y
-              service docker start
+              yum install -y docker
+              systemctl enable --now docker
               docker run -d --restart=always \
                 -e COC_API_TOKEN=${var.coc_api_token} \
-                -e DATABASE_URL=postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres \
+                -e DATABASE_URL=postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres \
                 ${var.image}
               EOT
 }

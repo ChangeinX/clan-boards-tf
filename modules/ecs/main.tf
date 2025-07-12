@@ -93,7 +93,7 @@ resource "aws_secretsmanager_secret" "database_url" {
 
 resource "aws_secretsmanager_secret_version" "database_url" {
   secret_id     = aws_secretsmanager_secret.database_url.id
-  secret_string = "postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
+  secret_string = "postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
 }
 
 resource "aws_iam_role_policy" "execution_secrets" {
