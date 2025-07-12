@@ -47,3 +47,8 @@ variable "static_ip_image" {
   description = "Docker image for the static IP worker"
   type        = string
 }
+
+variable "static_ip_allowed_ip" {
+  description = "CIDR allowed to access the static instance"
+  type        = string
+}

@@ -61,4 +61,5 @@ module "static_instance" {
   db_endpoint = module.rds.db_endpoint
   db_password = var.db_password
   coc_api_token = var.coc_api_token
+  allowed_ip   = var.static_ip_allowed_ip
 }

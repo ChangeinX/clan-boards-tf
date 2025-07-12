@@ -17,6 +17,7 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 app_image    = "<app image>"
 worker_image = "<worker image>"
 static_ip_image = "<image needing static IP>"
+static_ip_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"
 certificate_arn = "<acm certificate arn>"
 app_env = "production"
