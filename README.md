@@ -1,16 +1,13 @@
 # OpenTofu Web App Infrastructure
 
-This configuration provisions an AWS environment for a containerized web application using Fargate on Graviton (ARM64) and an RDS Postgres database.
+This configuration provisions an AWS environment for a containerized web application using Fargate on Graviton (ARM64) and an RDS Postgres database. The code is organised into modules for easier reuse:
 
-## Components
-- VPC with public subnets and private subnets for the database
-- Security groups for the ALB, ECS tasks and database
-- Application Load Balancer with HTTPS termination and HTTP redirect
-- ECS cluster with a task definition containing two containers
-- Fargate service behind the ALB running on ARM64
-- PostgreSQL RDS instance in private subnets with deletion protection
-- Separate CloudWatch log groups for each container
-- Secrets Manager stores worker environment variables
+- `networking` creates the VPC, public subnets and private subnets for the database
+- `alb` provisions the Application Load Balancer and related security group
+- `rds` creates the Postgres database in the private subnets
+- `ecs` sets up the ECS cluster, task definition and service, CloudWatch log groups and Secrets Manager entries
+
+Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager.
 
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:
@@ -23,9 +20,6 @@ certificate_arn = "<acm certificate arn>"
 app_env = "production"
 coc_api_token = "<clash of clans api token>"
 ```
-
-The configuration stores these values in AWS Secrets Manager and generates a
-random `SECRET_KEY` for the worker container.
 
 2. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
 
