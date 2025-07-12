@@ -1,10 +1,14 @@
 
+data "aws_ssm_parameter" "al2023_arm" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-minimal-kernel-6.1-arm64"
+}
+
 data "aws_ami" "al2023_arm" {
-  most_recent = true
   owners      = ["amazon"]
+  most_recent = true
   filter {
-    name   = "name"
-    values = ["al2023-ami-minimal-arm64-*"]
+    name   = "image-id"
+    values = [data.aws_ssm_parameter.al2023_arm.value]
   }
 }
 
@@ -48,6 +52,6 @@ resource "aws_instance" "this" {
 
 resource "aws_eip" "this" {
   instance = aws_instance.this.id
-  vpc      = true
+  domain   = "vpc"
 }
 
