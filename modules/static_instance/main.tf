@@ -111,7 +111,7 @@ resource "aws_instance" "this" {
               aws ecr get-login-password --region $ECR_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
               sudo docker run -d --restart=always --name ${var.app_name}-static \
                 -e COC_API_TOKEN='${var.coc_api_token}' \
-                -e DATABASE_URL='postgresql://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
+                -e DATABASE_URL='postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
                 ${var.image}
               set -H
               EOT

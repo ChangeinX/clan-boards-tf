@@ -39,7 +39,7 @@ resource "aws_security_group" "remote" {
 }
 
 resource "aws_db_subnet_group" "postgres" {
-  name_prefix = "${var.app_name}-db-subnet-"
+  name = "${var.app_name}-db-subnet-${var.vpc_id}"
 
   description = "Subnet group for the ${var.app_name} Postgres DB"
   subnet_ids  = var.private_subnet_ids
@@ -50,7 +50,7 @@ resource "aws_db_subnet_group" "postgres" {
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier_prefix = "${var.app_name}-db-"
+  identifier = "${var.app_name}-db-${var.vpc_id}"
   engine                 = "postgres"
   instance_class         = "db.t3.micro"
   username               = "postgres"
