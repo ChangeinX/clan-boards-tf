@@ -71,6 +71,11 @@ resource "aws_instance" "this" {
   iam_instance_profile        = aws_iam_instance_profile.this.name
   key_name                    = var.key_name
   associate_public_ip_address = true
+  user_data_replace_on_change = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   root_block_device {
     volume_size = 16
