@@ -145,6 +145,12 @@ resource "aws_ecs_task_definition" "app" {
           hostPort      = 80
         }
       ]
+      dependsOn = [
+        {
+          containerName = "worker"
+          condition     = "START"
+        }
+      ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -157,7 +163,19 @@ resource "aws_ecs_task_definition" "app" {
     {
       name      = "worker"
       image     = var.worker_image
-      essential = false
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8000
+          hostPort      = 8000
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8000"
+        }
+      ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
