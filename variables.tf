@@ -54,7 +54,17 @@ variable "public_ip" {
   type        = string
 }
 
-variable "bastion_cidr" {
+variable "static_ip_image" {
+  description = "Docker image for the sync service running behind the static IP"
+  type        = string
+}
+
+variable "static_ip_allowed_ip" {
   description = "CIDR allowed to SSH to the NAT instance"
+  type        = string
+}
+
+variable "static_ip_key_name" {
+  description = "EC2 key pair name used for the NAT instance"
   type        = string
 }

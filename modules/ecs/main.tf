@@ -27,6 +27,10 @@ resource "aws_cloudwatch_log_group" "worker" {
   name = "/ecs/${var.app_name}-worker"
 }
 
+resource "aws_cloudwatch_log_group" "static" {
+  name = "/ecs/${var.app_name}-static"
+}
+
 # IAM roles
 resource "aws_iam_role" "task_execution" {
   name = "${var.app_name}-task-exec"
@@ -176,14 +180,14 @@ resource "aws_ecs_task_definition" "app" {
       essential = true
       portMappings = [
         {
-          containerPort = 8000
-          hostPort      = 8000
+          containerPort = 8001
+          hostPort      = 8001
         }
       ]
       environment = [
         {
           name  = "PORT"
-          value = "8000"
+          value = "8001"
         },
         {
           name  = "SYNC_BASE"
@@ -214,6 +218,41 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "COC_API_TOKEN"
           valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        }
+      ]
+    },
+    {
+      name      = "static"
+      image     = var.static_ip_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8000
+          hostPort      = 8000
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8000"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.static.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "static"
+        }
+      }
+      secrets = [
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = aws_secretsmanager_secret.database_url.arn
         }
       ]
     }

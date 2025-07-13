@@ -6,7 +6,7 @@ resource "aws_security_group" "nat" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.bastion_cidr]
+    cidr_blocks = [var.allowed_ip]
   }
 
   ingress {
@@ -38,6 +38,7 @@ resource "aws_instance" "this" {
   instance_type               = "t4g.nano"
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.nat.id]
+  key_name                    = var.key_name
   associate_public_ip_address = true
   source_dest_check           = false
   user_data                   = <<-EOT

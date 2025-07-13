@@ -37,10 +37,11 @@ module "ecs" {
   region           = var.region
   app_image        = var.app_image
   worker_image     = var.worker_image
+  static_ip_image  = var.static_ip_image
   app_env          = var.app_env
   db_endpoint      = module.rds.db_endpoint
   db_password      = var.db_password
-  sync_base        = "https://api.clashofclans.com/v1"
+  sync_base        = "http://localhost:8000/sync"
   coc_api_token    = var.coc_api_token
 }
 
@@ -62,5 +63,6 @@ module "nat_instance" {
   subnet_id              = module.networking.public_subnet_ids[0]
   private_route_table_id = module.networking.private_route_table_id
   public_ip              = var.public_ip
-  bastion_cidr           = var.bastion_cidr
+  allowed_ip             = var.static_ip_allowed_ip
+  key_name               = var.static_ip_key_name
 }
