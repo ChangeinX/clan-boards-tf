@@ -15,3 +15,6 @@ variable "db_password" { type = string }
 variable "sync_base" { type = string }
 
 variable "coc_api_token" { type = string }
+
+variable "google_client_id" { type = string }
+variable "google_client_secret" { type = string }
