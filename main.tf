@@ -40,6 +40,7 @@ module "ecs" {
   app_env           = var.app_env
   db_endpoint       = module.rds.db_endpoint
   db_password       = var.db_password
+  sync_base         = "http://${module.static_instance.private_ip}:8000/sync"
 }
 
 module "rds" {

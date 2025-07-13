@@ -174,6 +174,10 @@ resource "aws_ecs_task_definition" "app" {
         {
           name  = "PORT"
           value = "8000"
+        },
+        {
+          name  = "SYNC_BASE"
+          value = var.sync_base
         }
       ]
       logConfiguration = {

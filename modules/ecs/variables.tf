@@ -10,3 +10,5 @@ variable "worker_image" { type = string }
 variable "app_env" { type = string }
 variable "db_endpoint" { type = string }
 variable "db_password" { type = string }
+
+variable "sync_base" { type = string }
