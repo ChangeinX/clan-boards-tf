@@ -12,10 +12,10 @@ resource "aws_security_group" "ecs" {
 
   # allow internal access to the static service
   ingress {
-    protocol        = "tcp"
-    from_port       = 8000
-    to_port         = 8000
-    security_groups = [aws_security_group.ecs.id]
+    protocol  = "tcp"
+    from_port = 8000
+    to_port   = 8000
+    self      = true
   }
 
   egress {
