@@ -24,9 +24,17 @@ db_password  = "<strong password>"
 certificate_arn = "<acm certificate arn>"
 app_env = "production"
 coc_api_token = "<clash of clans api token>"
+backend_bucket = "<s3 bucket for state>"
+backend_dynamodb_table = "<dynamodb table for locking>"
 ```
 
-2. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
+2. Create the state bucket and DynamoDB table using the helper script:
+
+```bash
+./scripts/setup-backend.sh <backend_bucket> <backend_dynamodb_table> <region>
+```
+
+3. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
 
 ```bash
 tofu init
