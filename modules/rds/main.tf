@@ -50,7 +50,7 @@ resource "aws_db_subnet_group" "postgres" {
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier = "${var.app_name}-db-${var.vpc_id}"
+  identifier             = "${var.app_name}-db-${var.vpc_id}"
   engine                 = "postgres"
   instance_class         = "db.t3.micro"
   username               = "postgres"
@@ -64,8 +64,8 @@ resource "aws_db_instance" "postgres" {
 
   lifecycle {
     create_before_destroy = true
-    replace_triggered_by  = [
-      aws_db_subnet_group.postgres 
+    replace_triggered_by = [
+      aws_db_subnet_group.postgres
     ]
   }
 }
