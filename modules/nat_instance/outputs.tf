@@ -3,5 +3,9 @@ output "nat_instance_id" {
 }
 
 output "nat_eip" {
-  value = data.aws_eip.nat.public_ip
+  value = aws_eip.nat.public_ip
+}
+
+output "nat_eip_allocation_id" {
+  value = aws_eip.nat.id
 }

@@ -10,6 +10,10 @@ output "nat_eip" {
   value = module.nat_instance.nat_eip
 }
 
+output "nat_eip_allocation_id" {
+  value = module.nat_instance.nat_eip_allocation_id
+}
+
 output "nat_instance_id" {
   value = module.nat_instance.nat_instance_id
 }

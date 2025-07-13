@@ -56,12 +56,13 @@ resource "aws_instance" "this" {
   }
 }
 
-data "aws_eip" "nat" {
-  id = var.public_ip
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  tags = { Name = "${var.app_name}-nat-eip" }
 }
 
 resource "aws_eip_association" "nat" {
-  allocation_id = var.public_ip
+  allocation_id = aws_eip.nat.id
   instance_id   = aws_instance.this.id
 }
 

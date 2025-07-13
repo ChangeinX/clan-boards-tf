@@ -62,7 +62,6 @@ module "nat_instance" {
   vpc_id                 = module.networking.vpc_id
   subnet_id              = module.networking.public_subnet_ids[0]
   private_route_table_id = module.networking.private_route_table_id
-  public_ip              = var.public_ip
   allowed_ip             = var.static_ip_allowed_ip
   key_name               = var.static_ip_key_name
 }

@@ -49,10 +49,6 @@ variable "certificate_arn" {
 }
 
 
-variable "public_ip" {
-  description = "Allocation ID of the Elastic IP for NAT"
-  type        = string
-}
 
 variable "static_ip_image" {
   description = "Docker image for the sync service running behind the static IP"
