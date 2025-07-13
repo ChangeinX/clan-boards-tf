@@ -27,6 +27,11 @@ resource "aws_cloudwatch_log_group" "worker" {
   name = "/ecs/${var.app_name}-worker"
 }
 
+resource "aws_cloudwatch_log_group" "static" {
+  name = "/ecs/${var.app_name}-static"
+}
+
+
 # IAM roles
 resource "aws_iam_role" "task_execution" {
   name = "${var.app_name}-task-exec"
@@ -96,6 +101,15 @@ resource "aws_secretsmanager_secret_version" "database_url" {
   secret_string = "postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
 }
 
+resource "aws_secretsmanager_secret" "coc_api_token" {
+  name = "${var.app_name}-coc-token"
+}
+
+resource "aws_secretsmanager_secret_version" "coc_api_token" {
+  secret_id     = aws_secretsmanager_secret.coc_api_token.id
+  secret_string = var.coc_api_token
+}
+
 resource "aws_iam_role_policy" "execution_secrets" {
   name = "${var.app_name}-execution-secrets"
   role = aws_iam_role.task_execution.id
@@ -109,6 +123,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         aws_secretsmanager_secret.app_env.arn,
         aws_secretsmanager_secret.database_url.arn,
         aws_secretsmanager_secret.secret_key.arn
+        , aws_secretsmanager_secret.coc_api_token.arn
       ]
     }]
   })
@@ -117,6 +132,27 @@ resource "aws_iam_role_policy" "execution_secrets" {
 # ECS cluster
 resource "aws_ecs_cluster" "this" {
   name = "${var.app_name}-cluster"
+}
+
+# Service discovery for internal communication
+resource "aws_service_discovery_private_dns_namespace" "this" {
+  name = "${var.app_name}.internal"
+  vpc  = var.vpc_id
+}
+
+resource "aws_service_discovery_service" "static" {
+  name = "static"
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.this.id
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+    routing_policy = "WEIGHTED"
+  }
+  health_check_custom_config {
+    failure_threshold = 1
+  }
 }
 
 # Task definition
@@ -200,6 +236,64 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "SECRET_KEY"
           valueFrom = aws_secretsmanager_secret.secret_key.arn
+        },
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        }
+      ]
+    }
+  ])
+}
+
+# Task definition for the collector service running the static IP image
+resource "aws_ecs_task_definition" "static" {
+  family                   = "${var.app_name}-static"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "static"
+      image     = var.static_ip_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8000
+          hostPort      = 8000
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8000"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.static.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "static"
+        }
+      }
+      secrets = [
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = aws_secretsmanager_secret.database_url.arn
         }
       ]
     }
@@ -214,9 +308,9 @@ resource "aws_ecs_service" "app" {
   desired_count   = 1
   launch_type     = "FARGATE"
   network_configuration {
-    subnets          = var.public_subnet_ids
+    subnets          = var.subnet_ids
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
   load_balancer {
     target_group_arn = var.target_group_arn
@@ -224,4 +318,22 @@ resource "aws_ecs_service" "app" {
     container_port   = 80
   }
   depends_on = [var.listener_arn]
+}
+
+# ECS service for the collector tasks
+resource "aws_ecs_service" "static" {
+  name            = "${var.app_name}-collector"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.static.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  service_registries {
+    registry_arn   = aws_service_discovery_service.static.arn
+    port           = 8000
+  }
 }
