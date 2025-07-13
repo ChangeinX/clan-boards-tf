@@ -28,11 +28,14 @@ backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
 ```
 
-2. Create the state bucket and DynamoDB table using the helper script:
+2. Create the state bucket and DynamoDB table using the helper script. The
+   region defaults to `us-east-1`:
 
 ```bash
 ./scripts/setup-backend.sh <backend_bucket> <backend_dynamodb_table> <region>
 ```
+The script enables versioning, default encryption and blocks public access on
+the bucket.
 
 3. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
 
