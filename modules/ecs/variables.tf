@@ -1,6 +1,6 @@
 variable "app_name" { type = string }
 variable "vpc_id" { type = string }
-variable "public_subnet_ids" { type = list(string) }
+variable "subnet_ids" { type = list(string) }
 variable "alb_sg_id" { type = string }
 variable "target_group_arn" { type = string }
 variable "listener_arn" { type = string }
@@ -12,3 +12,5 @@ variable "db_endpoint" { type = string }
 variable "db_password" { type = string }
 
 variable "sync_base" { type = string }
+
+variable "coc_api_token" { type = string }

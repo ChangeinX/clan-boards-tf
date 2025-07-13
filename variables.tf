@@ -48,18 +48,13 @@ variable "certificate_arn" {
   type        = string
 }
 
-variable "static_ip_image" {
-  description = "Docker image for the static IP worker"
+
+variable "public_ip" {
+  description = "Allocation ID of the Elastic IP for NAT"
   type        = string
 }
 
-variable "static_ip_allowed_ip" {
-  description = "CIDR allowed to access the static instance"
+variable "bastion_cidr" {
+  description = "CIDR allowed to SSH to the NAT instance"
   type        = string
-}
-
-variable "static_ip_key_name" {
-  description = "EC2 key pair name for SSH access to the static instance"
-  type        = string
-  default     = null
 }

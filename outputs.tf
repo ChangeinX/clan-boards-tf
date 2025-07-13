@@ -6,10 +6,10 @@ output "db_endpoint" {
   value = module.rds.db_endpoint
 }
 
-output "static_instance_ip" {
-  value = module.static_instance.public_ip
+output "nat_eip" {
+  value = module.nat_instance.nat_eip
 }
 
-output "static_instance_private_ip" {
-  value = module.static_instance.private_ip
+output "nat_instance_id" {
+  value = module.nat_instance.nat_instance_id
 }

@@ -96,6 +96,15 @@ resource "aws_secretsmanager_secret_version" "database_url" {
   secret_string = "postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
 }
 
+resource "aws_secretsmanager_secret" "coc_api_token" {
+  name = "${var.app_name}-coc-token"
+}
+
+resource "aws_secretsmanager_secret_version" "coc_api_token" {
+  secret_id     = aws_secretsmanager_secret.coc_api_token.id
+  secret_string = var.coc_api_token
+}
+
 resource "aws_iam_role_policy" "execution_secrets" {
   name = "${var.app_name}-execution-secrets"
   role = aws_iam_role.task_execution.id
@@ -109,6 +118,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         aws_secretsmanager_secret.app_env.arn,
         aws_secretsmanager_secret.database_url.arn,
         aws_secretsmanager_secret.secret_key.arn
+        , aws_secretsmanager_secret.coc_api_token.arn
       ]
     }]
   })
@@ -200,6 +210,10 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "SECRET_KEY"
           valueFrom = aws_secretsmanager_secret.secret_key.arn
+        },
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
         }
       ]
     }
@@ -214,9 +228,9 @@ resource "aws_ecs_service" "app" {
   desired_count   = 1
   launch_type     = "FARGATE"
   network_configuration {
-    subnets          = var.public_subnet_ids
+    subnets          = var.subnet_ids
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
   load_balancer {
     target_group_arn = var.target_group_arn

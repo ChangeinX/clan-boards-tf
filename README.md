@@ -6,9 +6,9 @@ This configuration provisions an AWS environment for a containerized web applica
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
 - `ecs` sets up the ECS cluster, task definition and service, CloudWatch log groups and Secrets Manager entries
-- `static_instance` runs a small EC2 instance with a fixed IP for the Clash of Clans API. The Docker container is started as `${app_name}-static` so you can view logs with `sudo docker logs ${app_name}-static -f`.
+- `nat_instance` provisions a lightweight Amazon Linux 2023 EC2 instance that acts as a NAT. It holds the Elastic IP so all Fargate tasks egress from a single static address.
 
-Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager. The Clash of Clans API token is supplied to the static instance rather than the worker.
+Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager including the `COC_API_TOKEN`.
 
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:
@@ -16,9 +16,8 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 ```hcl
 app_image    = "<app image>"
 worker_image = "<worker image>"
-static_ip_image = "<image needing static IP>"
-static_ip_allowed_ip = "<your ip>/32"
-static_ip_key_name = "<ec2 key pair name>"
+public_ip    = "eipalloc-xxxxxxxx"
+bastion_cidr = "<your ip>/32"
 db_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"
 certificate_arn = "<acm certificate arn>"
@@ -33,4 +32,4 @@ tofu init
 tofu apply
 ```
 
-The outputs will display the ALB DNS name, database endpoint and the static instance IP.
+The outputs will display the ALB DNS name, database endpoint and the NAT instance IP.
