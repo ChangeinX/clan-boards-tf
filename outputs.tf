@@ -9,3 +9,7 @@ output "db_endpoint" {
 output "static_instance_ip" {
   value = module.static_instance.public_ip
 }
+
+output "static_instance_private_ip" {
+  value = module.static_instance.private_ip
+}

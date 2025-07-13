@@ -40,6 +40,7 @@ module "ecs" {
   app_env           = var.app_env
   db_endpoint       = module.rds.db_endpoint
   db_password       = var.db_password
+  sync_base         = "http://${module.static_instance.private_ip}:8000/sync"
 }
 
 module "rds" {
@@ -58,11 +59,13 @@ module "static_instance" {
   vpc_id        = module.networking.vpc_id
   subnet_id     = module.networking.public_subnet_ids[0]
   rds_sg_id     = module.rds.rds_sg_id
+  ecs_sg_id     = module.ecs.ecs_sg_id
   image         = var.static_ip_image
   db_endpoint   = module.rds.db_endpoint
   db_password   = var.db_password
   coc_api_token = var.coc_api_token
   allowed_ip    = var.static_ip_allowed_ip
   key_name      = var.static_ip_key_name
+  worker_port   = 8000
   region        = var.region
 }

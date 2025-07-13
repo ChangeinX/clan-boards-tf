@@ -24,6 +24,14 @@ resource "aws_security_group" "this" {
     cidr_blocks = [var.allowed_ip]
   }
 
+  # Allow the worker tasks to call the static instance over the private network
+  ingress {
+    from_port       = var.worker_port
+    to_port         = var.worker_port
+    protocol        = "tcp"
+    security_groups = [var.ecs_sg_id]
+  }
+
   egress {
     from_port   = 443
     to_port     = 443
@@ -110,6 +118,7 @@ resource "aws_instance" "this" {
               ECR_REGION=$(echo "$ECR_REGISTRY" | cut -d. -f4)
               aws ecr get-login-password --region $ECR_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
               sudo docker run -d --restart=always --name ${var.app_name}-static \
+                -p ${var.worker_port}:${var.worker_port} \
                 -e COC_API_TOKEN='${var.coc_api_token}' \
                 -e DATABASE_URL='postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres' \
                 ${var.image}
