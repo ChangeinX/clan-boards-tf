@@ -41,7 +41,7 @@ module "ecs" {
   app_env          = var.app_env
   db_endpoint      = module.rds.db_endpoint
   db_password      = var.db_password
-  sync_base        = "http://localhost:8000/sync"
+  sync_base        = "http://static.${var.app_name}.internal:8000/sync"
   coc_api_token    = var.coc_api_token
 }
 
@@ -49,7 +49,7 @@ module "rds" {
   source             = "./modules/rds"
   app_name           = var.app_name
   vpc_id             = module.networking.vpc_id
-  private_subnet_ids = module.networking.public_subnet_ids
+  private_subnet_ids = module.networking.private_subnet_ids
   vpc_cidr           = module.networking.vpc_cidr
   db_password        = var.db_password
   allowed_ip         = var.db_allowed_ip

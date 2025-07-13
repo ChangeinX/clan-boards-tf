@@ -31,6 +31,7 @@ resource "aws_cloudwatch_log_group" "static" {
   name = "/ecs/${var.app_name}-static"
 }
 
+
 # IAM roles
 resource "aws_iam_role" "task_execution" {
   name = "${var.app_name}-task-exec"
@@ -133,6 +134,27 @@ resource "aws_ecs_cluster" "this" {
   name = "${var.app_name}-cluster"
 }
 
+# Service discovery for internal communication
+resource "aws_service_discovery_private_dns_namespace" "this" {
+  name = "${var.app_name}.internal"
+  vpc  = var.vpc_id
+}
+
+resource "aws_service_discovery_service" "static" {
+  name = "static"
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.this.id
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+    routing_policy = "WEIGHTED"
+  }
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+}
+
 # Task definition
 resource "aws_ecs_task_definition" "app" {
   family                   = var.app_name
@@ -220,7 +242,26 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = aws_secretsmanager_secret.coc_api_token.arn
         }
       ]
-    },
+    }
+  ])
+}
+
+# Task definition for the collector service running the static IP image
+resource "aws_ecs_task_definition" "static" {
+  family                   = "${var.app_name}-static"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
     {
       name      = "static"
       image     = var.static_ip_image
@@ -277,4 +318,22 @@ resource "aws_ecs_service" "app" {
     container_port   = 80
   }
   depends_on = [var.listener_arn]
+}
+
+# ECS service for the collector tasks
+resource "aws_ecs_service" "static" {
+  name            = "${var.app_name}-collector"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.static.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  service_registries {
+    registry_arn   = aws_service_discovery_service.static.arn
+    port           = 8000
+  }
 }

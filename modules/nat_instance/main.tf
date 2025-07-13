@@ -69,6 +69,6 @@ resource "aws_eip_association" "nat" {
 resource "aws_route" "private_to_nat" {
   route_table_id         = var.private_route_table_id
   destination_cidr_block = "0.0.0.0/0"
-  network_interface_id   = aws_instance.this.primary_network_interface_id
+  instance_id            = aws_instance.this.id
 }
 
