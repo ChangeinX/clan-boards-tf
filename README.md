@@ -26,6 +26,7 @@ app_env = "production"
 coc_api_token = "<clash of clans api token>"
 google_client_id = "<google oauth client id>"
 google_client_secret = "<google oauth client secret>"
+vite_base_path = "<base path>"
 backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
 ```

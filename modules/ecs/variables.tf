@@ -18,3 +18,5 @@ variable "coc_api_token" { type = string }
 
 variable "google_client_id" { type = string }
 variable "google_client_secret" { type = string }
+
+variable "vite_base_path" { type = string }

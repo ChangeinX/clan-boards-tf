@@ -45,6 +45,7 @@ module "ecs" {
   coc_api_token        = var.coc_api_token
   google_client_id     = var.google_client_id
   google_client_secret = var.google_client_secret
+  vite_base_path       = var.vite_base_path
 }
 
 module "rds" {

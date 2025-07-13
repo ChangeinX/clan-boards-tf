@@ -144,6 +144,15 @@ resource "aws_secretsmanager_secret_version" "google_client_secret" {
   secret_string = var.google_client_secret
 }
 
+resource "aws_secretsmanager_secret" "vite_base_path" {
+  name = "${var.app_name}-vite-base-path"
+}
+
+resource "aws_secretsmanager_secret_version" "vite_base_path" {
+  secret_id     = aws_secretsmanager_secret.vite_base_path.id
+  secret_string = var.vite_base_path
+}
+
 resource "aws_iam_role_policy" "execution_secrets" {
   name = "${var.app_name}-execution-secrets"
   role = aws_iam_role.task_execution.id
@@ -160,7 +169,8 @@ resource "aws_iam_role_policy" "execution_secrets" {
         , aws_secretsmanager_secret.coc_api_token.arn,
         aws_secretsmanager_secret.vite_google_client_id.arn,
         aws_secretsmanager_secret.google_client_id.arn,
-        aws_secretsmanager_secret.google_client_secret.arn
+        aws_secretsmanager_secret.google_client_secret.arn,
+        aws_secretsmanager_secret.vite_base_path.arn
       ]
     }]
   })
@@ -236,6 +246,10 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "VITE_GOOGLE_CLIENT_ID"
           valueFrom = aws_secretsmanager_secret.vite_google_client_id.arn
+        },
+        {
+          name      = "VITE_BASE_PATH"
+          valueFrom = aws_secretsmanager_secret.vite_base_path.arn
         }
       ]
     },

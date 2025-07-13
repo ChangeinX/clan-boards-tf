@@ -44,6 +44,12 @@ variable "google_client_secret" {
   sensitive   = true
 }
 
+variable "vite_base_path" {
+  description = "Base path for the frontend"
+  type        = string
+  sensitive   = true
+}
+
 variable "db_password" {
   description = "Password for the postgres database"
   type        = string
