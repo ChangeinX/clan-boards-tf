@@ -117,6 +117,33 @@ resource "aws_secretsmanager_secret_version" "coc_api_token" {
   secret_string = var.coc_api_token
 }
 
+resource "aws_secretsmanager_secret" "vite_google_client_id" {
+  name = "${var.app_name}-vite-google-client-id"
+}
+
+resource "aws_secretsmanager_secret_version" "vite_google_client_id" {
+  secret_id     = aws_secretsmanager_secret.vite_google_client_id.id
+  secret_string = var.google_client_id
+}
+
+resource "aws_secretsmanager_secret" "google_client_id" {
+  name = "${var.app_name}-google-client-id"
+}
+
+resource "aws_secretsmanager_secret_version" "google_client_id" {
+  secret_id     = aws_secretsmanager_secret.google_client_id.id
+  secret_string = var.google_client_id
+}
+
+resource "aws_secretsmanager_secret" "google_client_secret" {
+  name = "${var.app_name}-google-client-secret"
+}
+
+resource "aws_secretsmanager_secret_version" "google_client_secret" {
+  secret_id     = aws_secretsmanager_secret.google_client_secret.id
+  secret_string = var.google_client_secret
+}
+
 resource "aws_iam_role_policy" "execution_secrets" {
   name = "${var.app_name}-execution-secrets"
   role = aws_iam_role.task_execution.id
@@ -130,7 +157,10 @@ resource "aws_iam_role_policy" "execution_secrets" {
         aws_secretsmanager_secret.app_env.arn,
         aws_secretsmanager_secret.database_url.arn,
         aws_secretsmanager_secret.secret_key.arn
-        , aws_secretsmanager_secret.coc_api_token.arn
+        , aws_secretsmanager_secret.coc_api_token.arn,
+        aws_secretsmanager_secret.vite_google_client_id.arn,
+        aws_secretsmanager_secret.google_client_id.arn,
+        aws_secretsmanager_secret.google_client_secret.arn
       ]
     }]
   })
@@ -202,6 +232,12 @@ resource "aws_ecs_task_definition" "app" {
           awslogs-stream-prefix = "app"
         }
       }
+      secrets = [
+        {
+          name      = "VITE_GOOGLE_CLIENT_ID"
+          valueFrom = aws_secretsmanager_secret.vite_google_client_id.arn
+        }
+      ]
     },
     {
       name      = "worker"
@@ -247,6 +283,14 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "COC_API_TOKEN"
           valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_ID"
+          valueFrom = aws_secretsmanager_secret.google_client_id.arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_SECRET"
+          valueFrom = aws_secretsmanager_secret.google_client_secret.arn
         }
       ]
     },
@@ -301,6 +345,14 @@ resource "aws_ecs_task_definition" "static" {
         {
           name      = "DATABASE_URL"
           valueFrom = aws_secretsmanager_secret.database_url.arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_ID"
+          valueFrom = aws_secretsmanager_secret.google_client_id.arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_SECRET"
+          valueFrom = aws_secretsmanager_secret.google_client_secret.arn
         }
       ]
     }
