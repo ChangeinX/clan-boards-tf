@@ -58,7 +58,7 @@ resource "aws_instance" "this" {
 
 resource "aws_eip" "nat" {
   domain = "vpc"
-  tags = { Name = "${var.app_name}-nat-eip" }
+  tags   = { Name = "${var.app_name}-nat-eip" }
 }
 
 resource "aws_eip_association" "nat" {

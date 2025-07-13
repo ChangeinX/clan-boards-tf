@@ -26,10 +26,23 @@ app_env = "production"
 coc_api_token = "<clash of clans api token>"
 ```
 
-2. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
+2. Bootstrap the backend to create the S3 bucket and DynamoDB table:
 
 ```bash
-tofu init
+tofu -chdir=bootstrap init
+tofu -chdir=bootstrap apply \
+  -var="state_bucket=<state bucket>" \
+  -var="state_table=<state table>"
+```
+
+3. Initialize and apply the main configuration using [OpenTofu](https://opentofu.org/). Pass the backend settings so state is stored remotely:
+
+```bash
+tofu init \
+  -backend-config="bucket=<state bucket>" \
+  -backend-config="key=<app name>/terraform.tfstate" \
+  -backend-config="region=<region>" \
+  -backend-config="dynamodb_table=<state table>"
 tofu apply
 ```
 
