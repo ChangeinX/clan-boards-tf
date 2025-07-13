@@ -24,6 +24,14 @@ resource "aws_security_group" "this" {
     cidr_blocks = [var.allowed_ip]
   }
 
+  # Allow the worker tasks to call the static instance over the private network
+  ingress {
+    from_port       = var.worker_port
+    to_port         = var.worker_port
+    protocol        = "tcp"
+    security_groups = [var.ecs_sg_id]
+  }
+
   egress {
     from_port   = 443
     to_port     = 443
