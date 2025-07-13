@@ -10,6 +10,14 @@ resource "aws_security_group" "ecs" {
     security_groups = [var.alb_sg_id]
   }
 
+  # allow internal access to the static service
+  ingress {
+    protocol        = "tcp"
+    from_port       = 8000
+    to_port         = 8000
+    security_groups = [aws_security_group.ecs.id]
+  }
+
   egress {
     protocol    = "-1"
     from_port   = 0
@@ -133,6 +141,27 @@ resource "aws_ecs_cluster" "this" {
   name = "${var.app_name}-cluster"
 }
 
+# Cloud Map namespace for service discovery
+resource "aws_service_discovery_private_dns_namespace" "this" {
+  name = "${var.app_name}.local"
+  vpc  = var.vpc_id
+}
+
+resource "aws_service_discovery_service" "static" {
+  name = "static"
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.this.id
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+    routing_policy = "WEIGHTED"
+  }
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+}
+
 # Task definition
 resource "aws_ecs_task_definition" "app" {
   family                   = var.app_name
@@ -221,6 +250,25 @@ resource "aws_ecs_task_definition" "app" {
         }
       ]
     },
+  ])
+}
+
+# Task definition for the static sync service
+resource "aws_ecs_task_definition" "static" {
+  family                   = "${var.app_name}-static"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
     {
       name      = "static"
       image     = var.static_ip_image
@@ -277,4 +325,21 @@ resource "aws_ecs_service" "app" {
     container_port   = 80
   }
   depends_on = [var.listener_arn]
+}
+
+# Service running the static sync container
+resource "aws_ecs_service" "static" {
+  name            = "${var.app_name}-static-svc"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.static.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  service_registries {
+    registry_arn = aws_service_discovery_service.static.arn
+  }
 }
