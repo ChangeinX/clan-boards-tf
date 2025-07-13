@@ -41,7 +41,7 @@ module "ecs" {
   app_env          = var.app_env
   db_endpoint      = module.rds.db_endpoint
   db_password      = var.db_password
-  sync_base        = "http://localhost:8000/sync"
+  sync_base        = "http://static.${var.app_name}.local:8000/sync"
   coc_api_token    = var.coc_api_token
 }
 

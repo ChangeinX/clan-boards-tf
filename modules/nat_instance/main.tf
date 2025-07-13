@@ -49,6 +49,7 @@ resource "aws_instance" "this" {
     IF=$(ip route show default | awk '{print $5}')
     iptables -t nat -A POSTROUTING -o "$IF" -j MASQUERADE
     service iptables save
+    systemctl enable --now iptables
     EOT
   user_data_replace_on_change = true
   tags = {
