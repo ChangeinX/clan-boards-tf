@@ -242,6 +242,10 @@ resource "aws_ecs_task_definition" "app" {
       ]
     }
   ])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
 }
 
 resource "aws_ecs_task_definition" "worker" {
@@ -315,6 +319,10 @@ resource "aws_ecs_task_definition" "worker" {
       ]
     }
   ])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
 }
 
 # Task definition for the static sync service
@@ -377,6 +385,10 @@ resource "aws_ecs_task_definition" "static" {
       ]
     }
   ])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
 }
 
 # ECS service
@@ -397,6 +409,10 @@ resource "aws_ecs_service" "app" {
     container_port   = 3000
   }
   depends_on = [var.listener_arn]
+
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
 }
 
 resource "aws_ecs_service" "worker" {
@@ -416,6 +432,10 @@ resource "aws_ecs_service" "worker" {
     container_port   = 8001
   }
   depends_on = [var.listener_arn]
+
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
 }
 
 # Service running the static sync container
@@ -432,5 +452,9 @@ resource "aws_ecs_service" "static" {
   }
   service_registries {
     registry_arn = aws_service_discovery_service.static.arn
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition]
   }
 }
