@@ -218,12 +218,6 @@ resource "aws_ecs_task_definition" "app" {
           hostPort      = 80
         }
       ]
-      dependsOn = [
-        {
-          containerName = "worker"
-          condition     = "START"
-        }
-      ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -238,7 +232,25 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = aws_secretsmanager_secret.vite_google_client_id.arn
         }
       ]
-    },
+    }
+  ])
+}
+
+resource "aws_ecs_task_definition" "worker" {
+  family                   = "${var.app_name}-worker"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
     {
       name      = "worker"
       image     = var.worker_image
@@ -293,7 +305,7 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = aws_secretsmanager_secret.google_client_secret.arn
         }
       ]
-    },
+    }
   ])
 }
 
@@ -375,6 +387,25 @@ resource "aws_ecs_service" "app" {
     target_group_arn = var.target_group_arn
     container_name   = "app"
     container_port   = 80
+  }
+  depends_on = [var.listener_arn]
+}
+
+resource "aws_ecs_service" "worker" {
+  name            = "${var.app_name}-worker-svc"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.worker.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  load_balancer {
+    target_group_arn = var.worker_target_group_arn
+    container_name   = "worker"
+    container_port   = 8001
   }
   depends_on = [var.listener_arn]
 }

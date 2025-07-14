@@ -45,6 +45,18 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
+resource "aws_lb_target_group" "api" {
+  name        = "${var.app_name}-api-tg"
+  port        = 8001
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path = "/"
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
@@ -70,5 +82,22 @@ resource "aws_lb_listener" "https" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "api" {
+  count        = var.api_host == null ? 0 : 1
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api.arn
+  }
+
+  condition {
+    host_header {
+      values = [var.api_host]
+    }
   }
 }

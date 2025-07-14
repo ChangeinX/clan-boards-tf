@@ -24,27 +24,29 @@ module "alb" {
   vpc_id            = module.networking.vpc_id
   public_subnet_ids = module.networking.public_subnet_ids
   certificate_arn   = var.certificate_arn
+  api_host          = var.api_host
 }
 
 module "ecs" {
-  source               = "./modules/ecs"
-  app_name             = var.app_name
-  vpc_id               = module.networking.vpc_id
-  subnet_ids           = module.networking.private_subnet_ids
-  alb_sg_id            = module.alb.alb_sg_id
-  target_group_arn     = module.alb.target_group_arn
-  listener_arn         = module.alb.https_listener_arn
-  region               = var.region
-  app_image            = var.app_image
-  worker_image         = var.worker_image
-  static_ip_image      = var.static_ip_image
-  app_env              = var.app_env
-  db_endpoint          = module.rds.db_endpoint
-  db_password          = var.db_password
-  sync_base            = "http://static.${var.app_name}.local:8000/sync"
-  coc_api_token        = var.coc_api_token
-  google_client_id     = var.google_client_id
-  google_client_secret = var.google_client_secret
+  source                  = "./modules/ecs"
+  app_name                = var.app_name
+  vpc_id                  = module.networking.vpc_id
+  subnet_ids              = module.networking.private_subnet_ids
+  alb_sg_id               = module.alb.alb_sg_id
+  target_group_arn        = module.alb.target_group_arn
+  worker_target_group_arn = module.alb.api_target_group_arn
+  listener_arn            = module.alb.https_listener_arn
+  region                  = var.region
+  app_image               = var.app_image
+  worker_image            = var.worker_image
+  static_ip_image         = var.static_ip_image
+  app_env                 = var.app_env
+  db_endpoint             = module.rds.db_endpoint
+  db_password             = var.db_password
+  sync_base               = "http://static.${var.app_name}.local:8000/sync"
+  coc_api_token           = var.coc_api_token
+  google_client_id        = var.google_client_id
+  google_client_secret    = var.google_client_secret
 }
 
 module "rds" {
