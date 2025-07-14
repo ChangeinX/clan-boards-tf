@@ -34,7 +34,7 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "app" {
-  name_prefix = "${var.app_name}-tg-"
+  name_prefix = "${substr(var.app_name, 0, 2)}app-"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -50,7 +50,7 @@ resource "aws_lb_target_group" "app" {
 }
 
 resource "aws_lb_target_group" "api" {
-  name_prefix = "${var.app_name}-api-tg-"
+  name_prefix = "${substr(var.app_name, 0, 2)}api-"
   port        = 8001
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
