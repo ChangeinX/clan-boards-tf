@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'qa-*'
+      - 'prod-*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: opentofu/setup-opentofu@v1
+      - name: Set environment
+        run: |
+          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          elif [[ "$GITHUB_REF" == refs/tags/qa-* ]]; then
+            echo "ENVIRONMENT=qa" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+          fi
+      - name: Initialize
+        run: cd environments/$ENVIRONMENT && tofu init -input=false
+      - name: Apply
+        run: cd environments/$ENVIRONMENT && tofu apply -auto-approve -input=false
+
