@@ -60,6 +60,12 @@ variable "certificate_arn" {
   type        = string
 }
 
+variable "api_host" {
+  description = "Hostname for the API listener rule"
+  type        = string
+  default     = null
+}
+
 
 
 variable "static_ip_image" {
