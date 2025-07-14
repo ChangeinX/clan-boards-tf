@@ -48,3 +48,15 @@ tofu apply
 ```
 
 The outputs will display the ALB DNS name, database endpoint and the NAT instance's public IP and allocation ID.
+
+## Environments
+Separate Terraform roots are provided under `environments/dev`, `environments/qa` and `environments/prod`. Each folder uses its own state prefix so the stages are isolated.
+
+Run Terraform from the desired environment directory, for example:
+
+```bash
+cd environments/dev
+terraform init
+terraform apply
+```
+
