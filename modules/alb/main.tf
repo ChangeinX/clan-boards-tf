@@ -53,7 +53,7 @@ resource "aws_lb_target_group" "api" {
   target_type = "ip"
 
   health_check {
-    path = "/"
+    path = "/health"
   }
 }
 
