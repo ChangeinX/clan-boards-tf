@@ -5,8 +5,8 @@ resource "aws_security_group" "ecs" {
 
   ingress {
     protocol        = "tcp"
-    from_port       = 80
-    to_port         = 80
+    from_port       = 3000
+    to_port         = 3000
     security_groups = [var.alb_sg_id]
   }
 
@@ -222,8 +222,8 @@ resource "aws_ecs_task_definition" "app" {
       essential = true
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 3000
+          hostPort      = 3000
         }
       ]
       logConfiguration = {
@@ -394,7 +394,7 @@ resource "aws_ecs_service" "app" {
   load_balancer {
     target_group_arn = var.target_group_arn
     container_name   = "app"
-    container_port   = 80
+    container_port   = 3000
   }
   depends_on = [var.listener_arn]
 }
