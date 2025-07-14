@@ -10,6 +10,14 @@ resource "aws_security_group" "ecs" {
     security_groups = [var.alb_sg_id]
   }
 
+  # allow traffic from the ALB to the worker service
+  ingress {
+    protocol        = "tcp"
+    from_port       = 8001
+    to_port         = 8001
+    security_groups = [var.alb_sg_id]
+  }
+
   # allow internal access to the static service
   ingress {
     protocol  = "tcp"
