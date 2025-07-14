@@ -47,6 +47,7 @@ module "ecs" {
   coc_api_token           = var.coc_api_token
   google_client_id        = var.google_client_id
   google_client_secret    = var.google_client_secret
+  depends_on              = [module.alb]
 }
 
 module "rds" {
