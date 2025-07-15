@@ -92,3 +92,8 @@ variable "backend_dynamodb_table" {
   description = "DynamoDB table for state locking"
   type        = string
 }
+
+variable "frontend_bucket_name" {
+  description = "S3 bucket to host the front-end"
+  type        = string
+}
