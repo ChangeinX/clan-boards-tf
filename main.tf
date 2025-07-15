@@ -70,3 +70,8 @@ module "nat_instance" {
   allowed_ip             = var.static_ip_allowed_ip
   key_name               = var.static_ip_key_name
 }
+
+module "frontend" {
+  source      = "./modules/frontend"
+  bucket_name = var.frontend_bucket_name
+}

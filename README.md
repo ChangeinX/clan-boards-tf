@@ -7,6 +7,9 @@ This configuration provisions an AWS environment for a containerized web applica
 - `rds` creates the Postgres database in the private subnets
 - `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`.
 - `nat_instance` provisions a lightweight Amazon Linux 2023 EC2 instance that acts as a NAT. It automatically allocates an Elastic IP so all Fargate tasks egress from a single static address. The instance is reachable via SSH from `static_ip_allowed_ip` using the `static_ip_key_name` key pair for troubleshooting. The instance starts the iptables service on boot.
+- `frontend` creates an S3 bucket configured for static website hosting so the web app can be served directly from S3.
+
+The ECS service running the front-end container remains deployed for now to avoid downtime while migrating traffic.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager including the `COC_API_TOKEN` and Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
 
@@ -29,6 +32,7 @@ google_client_id = "<google oauth client id>"
 google_client_secret = "<google oauth client secret>"
 backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
+frontend_bucket_name = "<s3 bucket for frontend>"
 ```
 
 2. Create the state bucket and DynamoDB table using the helper script. The
