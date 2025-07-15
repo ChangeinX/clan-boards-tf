@@ -2,7 +2,9 @@
 
 This configuration provisions an AWS environment for a containerized web application using Fargate on Graviton (ARM64) and an RDS Postgres database. The code is organised into modules for easier reuse:
 
-- `networking` creates the VPC, public subnets and private subnets for the database
+- `networking` creates the VPC, public and private subnets for the database and sets up VPC
+  endpoints for Secrets Manager, ECR, CloudWatch Logs and S3 so tasks can pull
+  container images without internet access
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
 - `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`.
