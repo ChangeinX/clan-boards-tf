@@ -23,6 +23,26 @@ jobs:
           else
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
           fi
+      - name: Build tfvars from secrets
+        run: |
+          cat <<EOF > environments/$ENVIRONMENT/terraform.tfvars
+          app_image            = "${{ secrets.APP_IMAGE }}"
+          worker_image         = "${{ secrets.WORKER_IMAGE }}"
+          static_ip_image      = "${{ secrets.STATIC_IP_IMAGE }}"
+          static_ip_allowed_ip = "${{ secrets.STATIC_IP_ALLOWED_IP }}"
+          static_ip_key_name   = "${{ secrets.STATIC_IP_KEY_NAME }}"
+          db_allowed_ip        = "${{ secrets.DB_ALLOWED_IP }}"
+          db_password          = "${{ secrets.DB_PASSWORD }}"
+          certificate_arn      = "${{ secrets.CERTIFICATE_ARN }}"
+          api_host             = "${{ secrets.API_HOST }}"
+          app_env              = "${{ secrets.APP_ENV }}"
+          coc_api_token        = "${{ secrets.COC_API_TOKEN }}"
+          google_client_id     = "${{ secrets.GOOGLE_CLIENT_ID }}"
+          google_client_secret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          backend_bucket       = "${{ secrets.BACKEND_BUCKET }}"
+          backend_dynamodb_table = "${{ secrets.BACKEND_DYNAMODB_TABLE }}"
+          EOF
+        shell: bash
       - name: Initialize
         run: cd environments/$ENVIRONMENT && tofu init -input=false
       - name: Apply
