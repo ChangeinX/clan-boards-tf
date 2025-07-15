@@ -73,15 +73,6 @@ variable "static_ip_image" {
   type        = string
 }
 
-variable "static_ip_allowed_ip" {
-  description = "CIDR allowed to SSH to the NAT instance"
-  type        = string
-}
-
-variable "static_ip_key_name" {
-  description = "EC2 key pair name used for the NAT instance"
-  type        = string
-}
 
 variable "backend_bucket" {
   description = "S3 bucket for Terraform state"

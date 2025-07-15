@@ -61,14 +61,11 @@ module "rds" {
 }
 
 
-module "nat_instance" {
-  source                 = "./modules/nat_instance"
+module "nat_gateway" {
+  source                 = "./modules/nat_gateway"
   app_name               = var.app_name
-  vpc_id                 = module.networking.vpc_id
   subnet_id              = module.networking.public_subnet_ids[0]
   private_route_table_id = module.networking.private_route_table_id
-  allowed_ip             = var.static_ip_allowed_ip
-  key_name               = var.static_ip_key_name
 }
 
 module "frontend" {
