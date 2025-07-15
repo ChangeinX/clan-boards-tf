@@ -6,7 +6,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
 - `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`.
-- `nat_instance` provisions a lightweight Amazon Linux 2023 EC2 instance that acts as a NAT. It automatically allocates an Elastic IP so all Fargate tasks egress from a single static address. The instance is reachable via SSH from `static_ip_allowed_ip` using the `static_ip_key_name` key pair for troubleshooting. The instance starts the iptables service on boot.
+- `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting so the web app can be served directly from S3.
 
 The ECS service running the front-end container remains deployed for now to avoid downtime while migrating traffic.
@@ -20,8 +20,6 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 app_image           = "<app image>"
 worker_image        = "<worker image>"
 static_ip_image     = "<sync service image>"
-static_ip_allowed_ip = "<your ip>/32"
-static_ip_key_name  = "<ssh key name>"
 db_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"
 certificate_arn = "<acm certificate arn>"
@@ -51,7 +49,7 @@ tofu init
 tofu apply
 ```
 
-The outputs will display the ALB DNS name, database endpoint and the NAT instance's public IP and allocation ID.
+The outputs will display the ALB DNS name, database endpoint and the NAT gateway's public IP and allocation ID.
 
 ## Environments
 Separate Terraform roots are provided under `environments/dev`, `environments/qa` and `environments/prod`. Each folder uses its own state prefix so the stages are isolated.
