@@ -46,7 +46,7 @@ jobs:
           google_client_secret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
           backend_bucket       = "${{ secrets.BACKEND_BUCKET }}"
           backend_dynamodb_table = "${{ secrets.BACKEND_DYNAMODB_TABLE }}"
-          frontend_bucket_name   = "${{ secrets.FRONT_END_BUCKET }}
+          frontend_bucket_name   = "${{ secrets.FRONT_END_BUCKET }}"
           EOF
         shell: bash
       - name: Initialize
