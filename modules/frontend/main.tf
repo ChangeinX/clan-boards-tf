@@ -17,12 +17,12 @@ resource "aws_s3_bucket_public_access_block" "this" {
 
 data "aws_iam_policy_document" "public_read" {
   statement {
-    actions    = ["s3:GetObject"]
+    actions = ["s3:GetObject"]
     principals {
       type        = "AWS"
       identifiers = ["*"]
     }
-    resources  = ["${aws_s3_bucket.this.arn}/*"]
+    resources = ["${aws_s3_bucket.this.arn}/*"]
   }
 }
 
