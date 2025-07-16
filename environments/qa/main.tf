@@ -33,11 +33,9 @@ module "ecs" {
   vpc_id                  = module.networking.vpc_id
   subnet_ids              = module.networking.private_subnet_ids
   alb_sg_id               = module.alb.alb_sg_id
-  target_group_arn        = module.alb.target_group_arn
   worker_target_group_arn = module.alb.api_target_group_arn
   listener_arn            = module.alb.https_listener_arn
   region                  = var.region
-  app_image               = var.app_image
   worker_image            = var.worker_image
   static_ip_image         = var.static_ip_image
   app_env                 = var.app_env
