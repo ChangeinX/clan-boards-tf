@@ -35,10 +35,6 @@ resource "aws_security_group" "ecs" {
 }
 
 # Log groups
-resource "aws_cloudwatch_log_group" "app" {
-  name = "/ecs/${var.app_name}-app"
-}
-
 resource "aws_cloudwatch_log_group" "worker" {
   name = "/ecs/${var.app_name}-worker"
 }
@@ -125,14 +121,6 @@ resource "aws_secretsmanager_secret_version" "coc_api_token" {
   secret_string = var.coc_api_token
 }
 
-resource "aws_secretsmanager_secret" "vite_google_client_id" {
-  name = "${var.app_name}-vite-google-client-id"
-}
-
-resource "aws_secretsmanager_secret_version" "vite_google_client_id" {
-  secret_id     = aws_secretsmanager_secret.vite_google_client_id.id
-  secret_string = var.google_client_id
-}
 
 resource "aws_secretsmanager_secret" "google_client_id" {
   name = "${var.app_name}-google-client-id"
@@ -166,7 +154,6 @@ resource "aws_iam_role_policy" "execution_secrets" {
         aws_secretsmanager_secret.database_url.arn,
         aws_secretsmanager_secret.secret_key.arn
         , aws_secretsmanager_secret.coc_api_token.arn,
-        aws_secretsmanager_secret.vite_google_client_id.arn,
         aws_secretsmanager_secret.google_client_id.arn,
         aws_secretsmanager_secret.google_client_secret.arn
       ]
@@ -201,52 +188,6 @@ resource "aws_service_discovery_service" "static" {
 }
 
 # Task definition
-resource "aws_ecs_task_definition" "app" {
-  family                   = var.app_name
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
-  runtime_platform {
-    cpu_architecture        = "ARM64"
-    operating_system_family = "LINUX"
-  }
-
-  execution_role_arn = aws_iam_role.task_execution.arn
-  task_role_arn      = aws_iam_role.task_with_db.arn
-
-  container_definitions = jsonencode([
-    {
-      name      = "app"
-      image     = var.app_image
-      essential = true
-      portMappings = [
-        {
-          containerPort = 3000
-          hostPort      = 3000
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.app.name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = "app"
-        }
-      }
-      secrets = [
-        {
-          name      = "VITE_GOOGLE_CLIENT_ID"
-          valueFrom = aws_secretsmanager_secret.vite_google_client_id.arn
-        }
-      ]
-    }
-  ])
-
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
-}
 
 resource "aws_ecs_task_definition" "worker" {
   family                   = "${var.app_name}-worker"
@@ -391,33 +332,6 @@ resource "aws_ecs_task_definition" "static" {
   }
 }
 
-# ECS service
-resource "aws_ecs_service" "app" {
-  name            = "${var.app_name}-svc"
-  cluster         = aws_ecs_cluster.this.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-  network_configuration {
-    subnets          = var.subnet_ids
-    security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = false
-  }
-  load_balancer {
-    target_group_arn = var.target_group_arn
-    container_name   = "app"
-    container_port   = 3000
-  }
-  depends_on = [var.listener_arn]
-
-  deployment_minimum_healthy_percent = 100
-  deployment_maximum_percent         = 200
-
-
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
-}
 
 resource "aws_ecs_service" "worker" {
   name            = "${var.app_name}-worker-svc"

@@ -11,7 +11,6 @@ This configuration provisions an AWS environment for a containerized web applica
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting so the web app can be served directly from S3.
 
-The ECS service running the front-end container remains deployed for now to avoid downtime while migrating traffic.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager including the `COC_API_TOKEN` and Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
 
@@ -19,7 +18,6 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 1. Set the required variables in a `terraform.tfvars` file:
 
 ```hcl
-app_image           = "<app image>"
 worker_image        = "<worker image>"
 static_ip_image     = "<sync service image>"
 db_allowed_ip = "<your ip>/32"
