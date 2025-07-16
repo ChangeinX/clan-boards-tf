@@ -10,7 +10,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `rds` creates the Postgres database in the private subnets
 - `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
-- `frontend` creates an S3 bucket configured for static website hosting so the web app can be served directly from S3.
+- `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
 
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager including the `COC_API_TOKEN` and Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
