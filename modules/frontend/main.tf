@@ -53,6 +53,7 @@ resource "aws_cloudfront_distribution" "this" {
     forwarded_values {
       query_string = false
       cookies { forward = "none" }
+      headers = ["If-None-Match"]
     }
 
     min_ttl     = 0
