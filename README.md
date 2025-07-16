@@ -33,6 +33,8 @@ google_client_secret = "<google oauth client secret>"
 backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
 frontend_bucket_name = "<s3 bucket for frontend>"
+frontend_domain_names = ["app.example.com"]
+frontend_certificate_arn = "<acm cert arn for frontend>"
 ```
 
 2. Create the state bucket and DynamoDB table using the helper script. The
@@ -52,6 +54,8 @@ tofu apply
 ```
 
 The outputs will display the ALB DNS name, database endpoint and the NAT gateway's public IP and allocation ID.
+
+Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 
 ## Environments
 Separate Terraform roots are provided under `environments/dev`, `environments/qa` and `environments/prod`. Each folder uses its own state prefix so the stages are isolated.

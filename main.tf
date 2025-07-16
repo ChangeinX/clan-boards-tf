@@ -69,6 +69,8 @@ module "nat_gateway" {
 }
 
 module "frontend" {
-  source      = "./modules/frontend"
-  bucket_name = var.frontend_bucket_name
+  source          = "./modules/frontend"
+  bucket_name     = var.frontend_bucket_name
+  domain_names    = var.frontend_domain_names
+  certificate_arn = var.frontend_certificate_arn
 }
