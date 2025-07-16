@@ -1,5 +1,6 @@
 # OpenTofu Web App Infrastructure
 
+
 This configuration provisions an AWS environment for a containerized web application using Fargate on Graviton (ARM64) and an RDS Postgres database. The code is organised into modules for easier reuse:
 
 - `networking` creates the VPC, public and private subnets for the database and sets up VPC
