@@ -32,11 +32,16 @@ resource "aws_s3_bucket_policy" "public" {
 }
 
 resource "aws_cloudfront_distribution" "this" {
-  enabled = true
+  enabled             = true
+  default_root_object = "index.html"
 
   origin {
-    domain_name = aws_s3_bucket.this.website_endpoint
+    domain_name = aws_s3_bucket.this.bucket_regional_domain_name
     origin_id   = aws_s3_bucket.this.id
+
+    s3_origin_config {
+      origin_access_identity = ""
+    }
   }
 
   default_cache_behavior {
@@ -63,9 +68,19 @@ resource "aws_cloudfront_distribution" "this" {
 
   price_class = "PriceClass_100"
 
-  viewer_certificate {
-    acm_certificate_arn = var.certificate_arn
-    ssl_support_method  = "sni-only"
+  dynamic "viewer_certificate" {
+    for_each = var.certificate_arn == null ? [1] : []
+    content {
+      cloudfront_default_certificate = true
+    }
+  }
+
+  dynamic "viewer_certificate" {
+    for_each = var.certificate_arn != null ? [1] : []
+    content {
+      acm_certificate_arn = var.certificate_arn
+      ssl_support_method  = "sni-only"
+    }
   }
 
   aliases = var.domain_names
