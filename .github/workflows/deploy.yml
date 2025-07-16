@@ -31,7 +31,6 @@ jobs:
       - name: Build tfvars from secrets
         run: |
           cat <<EOF > environments/$ENVIRONMENT/terraform.tfvars
-          app_image            = "${{ secrets.APP_IMAGE }}"
           worker_image         = "${{ secrets.WORKER_IMAGE }}"
           static_ip_image      = "${{ secrets.STATIC_IP_IMAGE }}"
           db_allowed_ip        = "${{ secrets.DB_ALLOWED_IP }}"

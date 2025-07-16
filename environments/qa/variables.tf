@@ -10,11 +10,6 @@ variable "app_name" {
   default     = "webapp"
 }
 
-variable "app_image" {
-  description = "Docker image for the web application"
-  type        = string
-}
-
 variable "worker_image" {
   description = "Docker image for the worker"
   type        = string
