@@ -88,3 +88,15 @@ variable "frontend_bucket_name" {
   description = "S3 bucket to host the front-end"
   type        = string
 }
+
+variable "frontend_domain_names" {
+  description = "Domain names for the front-end CloudFront distribution"
+  type        = list(string)
+  default     = []
+}
+
+variable "frontend_certificate_arn" {
+  description = "ACM certificate ARN for the front-end distribution"
+  type        = string
+  default     = null
+}

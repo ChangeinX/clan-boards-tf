@@ -25,3 +25,11 @@ output "frontend_bucket" {
 output "frontend_url" {
   value = module.frontend.website_endpoint
 }
+
+output "frontend_distribution" {
+  value = module.frontend.distribution_domain_name
+}
+
+output "frontend_distribution_id" {
+  value = module.frontend.distribution_id
+}
