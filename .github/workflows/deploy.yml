@@ -46,6 +46,7 @@ jobs:
           frontend_bucket_name   = "${{ secrets.FRONT_END_BUCKET }}"
           frontend_domain_names   = ["${{ secrets.FRONTEND_DOMAIN_NAMES }}"]
           frontend_certificate_arn = "${{ secrets.CERTIFICATE_ARN }}"
+          messages_image = "${{ secrets.MESSAGES_IMAGE }}"
           EOF
         shell: bash
       - name: Initialize
