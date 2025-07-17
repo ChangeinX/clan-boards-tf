@@ -11,6 +11,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
+- `chat` provisions an AppSync API secured with Google Sign-In and a DynamoDB table to store messages.
 
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager including the `COC_API_TOKEN` and Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
@@ -52,7 +53,7 @@ tofu init
 tofu apply
 ```
 
-The outputs will display the ALB DNS name, database endpoint and the NAT gateway's public IP and allocation ID.
+The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the AppSync chat API URL.
 
 Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 
