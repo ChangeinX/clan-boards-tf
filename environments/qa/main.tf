@@ -45,6 +45,7 @@ module "ecs" {
   db_password               = var.db_password
   sync_base                 = "http://static.${var.app_name}.local:8000/sync"
   messages_table            = module.chat.table_name
+  messages_table_arn        = module.chat.table_arn
   appsync_events_url        = module.chat.events_url
   coc_api_token             = var.coc_api_token
   google_client_id          = var.google_client_id

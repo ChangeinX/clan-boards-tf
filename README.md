@@ -8,10 +8,10 @@ This configuration provisions an AWS environment for a containerized web applica
   container images without internet access
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
-- `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`.
+- `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`. It now requires the DynamoDB table ARN so tasks can write to the chat table.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
-- `chat` provisions an AppSync API secured with Google Sign-In and a DynamoDB table to store messages. It can optionally be accessed from a custom domain by providing a certificate and hostname.
+- `chat` provisions an AppSync API secured with Google Sign-In and a DynamoDB table to store messages. It outputs the table name and ARN for use in IAM policies and can optionally be accessed from a custom domain by providing a certificate and hostname.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
 ## Usage
