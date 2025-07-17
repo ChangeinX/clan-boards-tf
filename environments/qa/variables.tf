@@ -63,8 +63,14 @@ variable "api_host" {
 
 
 
+
 variable "static_ip_image" {
   description = "Docker image for the sync service running behind the static IP"
+  type        = string
+}
+
+variable "messages_image" {
+  description = "Docker image for the messages service"
   type        = string
 }
 

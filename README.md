@@ -22,6 +22,7 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 ```hcl
 worker_image        = "<worker image>"
 static_ip_image     = "<sync service image>"
+messages_image      = "<messages service image>"
 db_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"
 certificate_arn = "<acm certificate arn>"
