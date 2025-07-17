@@ -75,7 +75,7 @@ resource "aws_appsync_datasource" "chat_history" {
 
 resource "aws_iam_role_policy" "ecs_publish" {
   name = "${var.app_name}-chat-publish"
-  role = var.ecs_task_role_arn
+  role = basename(var.ecs_task_role_arn)
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
