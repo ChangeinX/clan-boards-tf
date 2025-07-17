@@ -321,7 +321,7 @@ resource "aws_ecs_task_definition" "worker" {
   ])
 
   lifecycle {
-    ignore_changes = [container_definitions]
+    ignore_changes = [container_definitions[0].image]
   }
 }
 
@@ -387,7 +387,7 @@ resource "aws_ecs_task_definition" "static" {
   ])
 
   lifecycle {
-    ignore_changes = [container_definitions]
+    ignore_changes = [container_definitions[0].image]
   }
 }
 
@@ -468,7 +468,7 @@ resource "aws_ecs_task_definition" "messages" {
   ])
 
   lifecycle {
-    ignore_changes = [container_definitions]
+    ignore_changes = [container_definitions[0].image]
   }
 }
 
@@ -543,7 +543,4 @@ resource "aws_ecs_service" "messages" {
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
 
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
 }
