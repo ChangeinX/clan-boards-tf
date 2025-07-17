@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "dynamodb_put" {
 }
 
 resource "aws_appsync_event_api" "chat" {
-  name               = "${var.app_name}-chat-api"
+  name                = "${var.app_name}-chat-api"
   authentication_type = "OPENID_CONNECT"
 
   openid_connect_config {
@@ -62,12 +62,12 @@ resource "aws_appsync_event_api" "chat" {
 
   channel_namespace {
     name        = "/groups/{groupId}"
-    data_source = aws_appsync_datasource.chat_history.name
+    data_source = "ChatHistory"
   }
 
   channel_namespace {
     name        = "/global"
-    data_source = aws_appsync_datasource.chat_history.name
+    data_source = "ChatHistory"
   }
 }
 
