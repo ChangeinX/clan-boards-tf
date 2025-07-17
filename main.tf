@@ -28,24 +28,26 @@ module "alb" {
 }
 
 module "ecs" {
-  source                  = "./modules/ecs"
-  app_name                = var.app_name
-  vpc_id                  = module.networking.vpc_id
-  subnet_ids              = module.networking.private_subnet_ids
-  alb_sg_id               = module.alb.alb_sg_id
-  worker_target_group_arn = module.alb.api_target_group_arn
-  listener_arn            = module.alb.https_listener_arn
-  region                  = var.region
-  worker_image            = var.worker_image
-  static_ip_image         = var.static_ip_image
-  app_env                 = var.app_env
-  db_endpoint             = module.rds.db_endpoint
-  db_password             = var.db_password
-  sync_base               = "http://static.${var.app_name}.local:8000/sync"
-  coc_api_token           = var.coc_api_token
-  google_client_id        = var.google_client_id
-  google_client_secret    = var.google_client_secret
-  depends_on              = [module.alb]
+  source                    = "./modules/ecs"
+  app_name                  = var.app_name
+  vpc_id                    = module.networking.vpc_id
+  subnet_ids                = module.networking.private_subnet_ids
+  alb_sg_id                 = module.alb.alb_sg_id
+  worker_target_group_arn   = module.alb.api_target_group_arn
+  messages_target_group_arn = module.alb.messages_target_group_arn
+  listener_arn              = module.alb.https_listener_arn
+  region                    = var.region
+  worker_image              = var.worker_image
+  static_ip_image           = var.static_ip_image
+  messages_image            = var.messages_image
+  app_env                   = var.app_env
+  db_endpoint               = module.rds.db_endpoint
+  db_password               = var.db_password
+  sync_base                 = "http://static.${var.app_name}.local:8000/sync"
+  coc_api_token             = var.coc_api_token
+  google_client_id          = var.google_client_id
+  google_client_secret      = var.google_client_secret
+  depends_on                = [module.alb]
 }
 
 module "rds" {

@@ -68,6 +68,11 @@ variable "static_ip_image" {
   type        = string
 }
 
+variable "messages_image" {
+  description = "Docker image for the messages service"
+  type        = string
+}
+
 
 variable "backend_bucket" {
   description = "S3 bucket for Terraform state"

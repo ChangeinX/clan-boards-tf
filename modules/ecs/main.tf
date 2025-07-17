@@ -18,6 +18,14 @@ resource "aws_security_group" "ecs" {
     security_groups = [var.alb_sg_id]
   }
 
+  # allow traffic from the ALB to the messages service
+  ingress {
+    protocol        = "tcp"
+    from_port       = 8010
+    to_port         = 8010
+    security_groups = [var.alb_sg_id]
+  }
+
   # allow internal access to the static service
   ingress {
     protocol  = "tcp"
@@ -41,6 +49,10 @@ resource "aws_cloudwatch_log_group" "worker" {
 
 resource "aws_cloudwatch_log_group" "static" {
   name = "/ecs/${var.app_name}-static"
+}
+
+resource "aws_cloudwatch_log_group" "messages" {
+  name = "/ecs/${var.app_name}-messages"
 }
 
 # IAM roles
@@ -332,6 +344,79 @@ resource "aws_ecs_task_definition" "static" {
   }
 }
 
+resource "aws_ecs_task_definition" "messages" {
+  family                   = "${var.app_name}-messages"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "messages"
+      image     = var.messages_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8010
+          hostPort      = 8010
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8010"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.messages.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "messages"
+        }
+      }
+      secrets = [
+        {
+          name      = "APP_ENV"
+          valueFrom = aws_secretsmanager_secret.app_env.arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = aws_secretsmanager_secret.database_url.arn
+        },
+        {
+          name      = "SECRET_KEY"
+          valueFrom = aws_secretsmanager_secret.secret_key.arn
+        },
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_ID"
+          valueFrom = aws_secretsmanager_secret.google_client_id.arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_SECRET"
+          valueFrom = aws_secretsmanager_secret.google_client_secret.arn
+        }
+      ]
+    }
+  ])
+
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
+}
+
 
 resource "aws_ecs_service" "worker" {
   name            = "${var.app_name}-worker-svc"
@@ -373,6 +458,32 @@ resource "aws_ecs_service" "static" {
   service_registries {
     registry_arn = aws_service_discovery_service.static.arn
   }
+
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
+}
+
+resource "aws_ecs_service" "messages" {
+  name            = "${var.app_name}-messages-svc"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.messages.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  load_balancer {
+    target_group_arn = var.messages_target_group_arn
+    container_name   = "messages"
+    container_port   = 8010
+  }
+  depends_on = [var.listener_arn]
 
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200

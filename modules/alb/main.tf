@@ -65,6 +65,22 @@ resource "aws_lb_target_group" "api" {
   }
 }
 
+resource "aws_lb_target_group" "messages" {
+  name_prefix = "${substr(var.app_name, 0, 2)}msg-"
+  port        = 8010
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  health_check {
+    path = "/api/v1/health"
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
