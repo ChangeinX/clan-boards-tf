@@ -13,3 +13,7 @@ output "table_name" {
 output "events_url" {
   value = "https://${aws_appsync_graphql_api.chat.id}.appsync-realtime-api.${data.aws_region.current.name}.amazonaws.com/graphql"
 }
+
+output "table_arn" {
+  value = aws_dynamodb_table.messages.arn
+}
