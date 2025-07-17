@@ -321,7 +321,7 @@ resource "aws_ecs_task_definition" "worker" {
   ])
 
   lifecycle {
-    ignore_changes = [container_definitions[0].image]
+    ignore_changes = [container_definitions]
   }
 }
 
@@ -387,7 +387,7 @@ resource "aws_ecs_task_definition" "static" {
   ])
 
   lifecycle {
-    ignore_changes = [container_definitions[0].image]
+    ignore_changes = [container_definitions]
   }
 }
 
@@ -468,7 +468,7 @@ resource "aws_ecs_task_definition" "messages" {
   ])
 
   lifecycle {
-    ignore_changes = [container_definitions[0].image]
+    ignore_changes = [container_definitions]
   }
 }
 
