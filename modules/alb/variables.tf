@@ -6,7 +6,3 @@ variable "api_host" {
   type    = string
   default = null
 }
-variable "messages_host" {
-  type    = string
-  default = null
-}

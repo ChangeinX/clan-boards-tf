@@ -25,7 +25,6 @@ module "alb" {
   public_subnet_ids = module.networking.public_subnet_ids
   certificate_arn   = var.certificate_arn
   api_host          = var.api_host
-  messages_host     = var.messages_host
 }
 
 module "ecs" {
