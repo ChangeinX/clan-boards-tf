@@ -45,7 +45,7 @@ jobs:
           backend_dynamodb_table = "${{ secrets.BACKEND_DYNAMODB_TABLE }}"
           frontend_bucket_name   = "${{ secrets.FRONT_END_BUCKET }}"
           frontend_domain_names   = ["${{ secrets.FRONTEND_DOMAIN_NAMES }}"]
-          front_end_certificate_arn = "${{ secrets.CERTIFICATE_ARN }}"
+          frontend_certificate_arn = "${{ secrets.CERTIFICATE_ARN }}"
           EOF
         shell: bash
       - name: Initialize
