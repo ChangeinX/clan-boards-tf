@@ -72,3 +72,12 @@ module "frontend" {
   domain_names    = var.frontend_domain_names
   certificate_arn = var.frontend_certificate_arn
 }
+
+module "appsync_chat" {
+  source                     = "../../modules/appsync_chat"
+  app_name                   = var.app_name
+  region                     = var.region
+  google_oauth_web_client_id = var.google_oauth_web_client_id
+  vpc_cidr                   = module.networking.vpc_cidr
+  ecs_task_role_arn          = module.ecs.task_role_arn
+}

@@ -39,6 +39,11 @@ variable "google_client_secret" {
   sensitive   = true
 }
 
+variable "google_oauth_web_client_id" {
+  description = "Google OAuth 2.0 Web Client Id used by the PWA"
+  type        = string
+}
+
 variable "db_password" {
   description = "Password for the postgres database"
   type        = string

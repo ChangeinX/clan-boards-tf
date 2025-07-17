@@ -33,3 +33,15 @@ output "frontend_distribution" {
 output "frontend_distribution_id" {
   value = module.frontend.distribution_id
 }
+
+output "chat_api_wss" {
+  value = module.appsync_chat.api_url_wss
+}
+
+output "chat_api_https" {
+  value = module.appsync_chat.api_url_https
+}
+
+output "chat_table" {
+  value = module.appsync_chat.table_name
+}
