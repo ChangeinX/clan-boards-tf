@@ -1,9 +1,9 @@
 output "api_url_wss" {
-  value = aws_appsync_event_api.chat.uris["real_time_url"]
+  value = aws_cloudformation_stack.chat_api.outputs["RealTimeUrl"]
 }
 
 output "api_url_https" {
-  value = aws_appsync_event_api.chat.uris["graphql_url"]
+  value = aws_cloudformation_stack.chat_api.outputs["GraphQLUrl"]
 }
 
 output "table_name" {

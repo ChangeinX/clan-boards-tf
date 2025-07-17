@@ -45,41 +45,31 @@ resource "aws_iam_role_policy" "dynamodb_put" {
   })
 }
 
-resource "aws_appsync_event_api" "chat" {
-  name                = "${var.app_name}-chat-api"
-  authentication_type = "OPENID_CONNECT"
-
-  openid_connect_config {
-    issuer    = "https://accounts.google.com"
-    client_id = var.google_oauth_web_client_id
-    auth_ttl  = 3600
-    iat_ttl   = 3600
-  }
-
-  additional_authentication_provider {
-    authentication_type = "AWS_IAM"
-  }
-
-  channel_namespace {
-    name        = "/groups/{groupId}"
-    data_source = "ChatHistory"
-  }
-
-  channel_namespace {
-    name        = "/global"
-    data_source = "ChatHistory"
+data "template_file" "event_api" {
+  template = file("${path.module}/event_api.yaml.tpl")
+  vars = {
+    api_name     = "${var.app_name}-chat-api"
+    client_id    = var.google_oauth_web_client_id
+    table_name   = aws_dynamodb_table.chat_history.name
+    service_role = aws_iam_role.appsync_exec.arn
+    region       = var.region
   }
 }
 
+resource "aws_cloudformation_stack" "chat_api" {
+  name          = "${var.app_name}-chat-api"
+  template_body = data.template_file.event_api.rendered
+}
+
 resource "aws_appsync_datasource" "chat_history" {
-  api_id           = aws_appsync_event_api.chat.id
+  api_id           = aws_cloudformation_stack.chat_api.outputs["ApiId"]
   name             = "ChatHistory"
   type             = "AMAZON_DYNAMODB"
   service_role_arn = aws_iam_role.appsync_exec.arn
 
   dynamodb_config {
     table_name = aws_dynamodb_table.chat_history.name
-    aws_region = var.region
+    region     = var.region
   }
 }
 
@@ -91,7 +81,7 @@ resource "aws_iam_role_policy" "ecs_publish" {
     Statement = [{
       Effect   = "Allow",
       Action   = ["appsync:GraphQL"],
-      Resource = aws_appsync_event_api.chat.arn,
+      Resource = aws_cloudformation_stack.chat_api.outputs["ApiArn"],
       Condition = {
         IpAddress = { "aws:VpcSourceIp" = var.vpc_cidr }
       }
@@ -102,13 +92,13 @@ resource "aws_iam_role_policy" "ecs_publish" {
 resource "aws_ssm_parameter" "api_url_wss" {
   name  = "/app/chat/api_url_wss"
   type  = "String"
-  value = aws_appsync_event_api.chat.uris["real_time_url"]
+  value = aws_cloudformation_stack.chat_api.outputs["RealTimeUrl"]
 }
 
 resource "aws_ssm_parameter" "api_url_https" {
   name  = "/app/chat/api_url_https"
   type  = "String"
-  value = aws_appsync_event_api.chat.uris["graphql_url"]
+  value = aws_cloudformation_stack.chat_api.outputs["GraphQLUrl"]
 }
 
 resource "aws_ssm_parameter" "api_region" {

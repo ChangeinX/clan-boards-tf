@@ -5,10 +5,22 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = "~> 1.0"
+    }
+    template = {
+      source  = "hashicorp/template"
+      version = "~> 2.0"
+    }
   }
 }
 
 provider "aws" {
+  region = var.region
+}
+
+provider "awscc" {
   region = var.region
 }
 
