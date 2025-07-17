@@ -72,3 +72,9 @@ module "frontend" {
   domain_names    = var.frontend_domain_names
   certificate_arn = var.frontend_certificate_arn
 }
+
+module "chat" {
+  source           = "./modules/chat"
+  app_name         = var.app_name
+  google_client_id = var.google_client_id
+}
