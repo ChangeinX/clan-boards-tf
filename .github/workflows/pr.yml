@@ -6,13 +6,16 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: ["environments/dev", "environments/qa", "environments/prod"]
     steps:
       - uses: actions/checkout@v3
       - uses: opentofu/setup-opentofu@v1
-      - name: Initialize
-        run: tofu init -backend=false
       - name: Format
         run: tofu fmt -check -recursive
+      - name: Initialize
+        run: cd ${{ matrix.dir }} && tofu init -backend=false
       - name: Validate
-        run: tofu validate
+        run: cd ${{ matrix.dir }} && tofu validate
 

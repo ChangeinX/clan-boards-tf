@@ -44,6 +44,8 @@ module "ecs" {
   db_endpoint               = module.rds.db_endpoint
   db_password               = var.db_password
   sync_base                 = "http://static.${var.app_name}.local:8000/sync"
+  messages_table            = module.chat.table_name
+  appsync_events_url        = module.chat.events_url
   coc_api_token             = var.coc_api_token
   google_client_id          = var.google_client_id
   google_client_secret      = var.google_client_secret
@@ -79,4 +81,6 @@ module "chat" {
   source           = "../../modules/chat"
   app_name         = var.app_name
   google_client_id = var.google_client_id
+  domain_name      = var.chat_domain_name
+  certificate_arn  = var.chat_certificate_arn
 }

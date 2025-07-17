@@ -101,3 +101,15 @@ variable "frontend_certificate_arn" {
   type        = string
   default     = null
 }
+
+variable "chat_domain_name" {
+  description = "Custom domain for the chat API"
+  type        = string
+  default     = null
+}
+
+variable "chat_certificate_arn" {
+  description = "ACM certificate ARN for the chat API domain"
+  type        = string
+  default     = null
+}
