@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 resource "aws_security_group" "ecs" {
   name        = "${var.app_name}-ecs-sg"
   description = "Allow ECS tasks"
@@ -90,20 +88,6 @@ resource "aws_iam_role" "task_with_db" {
 resource "aws_iam_role_policy_attachment" "task_db_policy" {
   role       = aws_iam_role.task_with_db.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
-}
-
-resource "aws_iam_role_policy" "task_messages_dynamo" {
-  name = "${var.app_name}-messages-dynamo"
-  role = aws_iam_role.task_with_db.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["dynamodb:PutItem"]
-      Resource = "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.messages_table}"
-    }]
-  })
 }
 
 # Secrets
