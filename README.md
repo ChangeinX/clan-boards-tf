@@ -47,9 +47,10 @@ chat_certificate_arn = "<acm cert arn for chat>"
 The script enables versioning, default encryption and blocks public access on
 the bucket.
 
-3. Initialize and apply the configuration using [OpenTofu](https://opentofu.org/):
+3. Initialize and apply the configuration from one of the environment directories using [OpenTofu](https://opentofu.org/):
 
 ```bash
+cd environments/dev
 tofu init
 tofu apply
 ```

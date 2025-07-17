@@ -196,6 +196,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         aws_secretsmanager_secret.aws_region.arn,
         aws_secretsmanager_secret.messages_table.arn,
         aws_secretsmanager_secret.appsync_events_url.arn,
+        aws_secretsmanager_secret.coc_api_token.arn,
         aws_secretsmanager_secret.google_client_id.arn,
         aws_secretsmanager_secret.google_client_secret.arn
       ]
@@ -288,16 +289,8 @@ resource "aws_ecs_task_definition" "worker" {
           valueFrom = aws_secretsmanager_secret.secret_key.arn
         },
         {
-          name      = "AWS_REGION"
-          valueFrom = aws_secretsmanager_secret.aws_region.arn
-        },
-        {
-          name      = "MESSAGES_TABLE"
-          valueFrom = aws_secretsmanager_secret.messages_table.arn
-        },
-        {
-          name      = "APPSYNC_EVENTS_URL"
-          valueFrom = aws_secretsmanager_secret.appsync_events_url.arn
+          name      = "COC_API_TOKEN"
+          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
         },
         {
           name      = "GOOGLE_CLIENT_ID"
@@ -435,8 +428,16 @@ resource "aws_ecs_task_definition" "messages" {
           valueFrom = aws_secretsmanager_secret.secret_key.arn
         },
         {
-          name      = "COC_API_TOKEN"
-          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+          name      = "AWS_REGION"
+          valueFrom = aws_secretsmanager_secret.aws_region.arn
+        },
+        {
+          name      = "MESSAGES_TABLE"
+          valueFrom = aws_secretsmanager_secret.messages_table.arn
+        },
+        {
+          name      = "APPSYNC_EVENTS_URL"
+          valueFrom = aws_secretsmanager_secret.appsync_events_url.arn
         },
         {
           name      = "GOOGLE_CLIENT_ID"
