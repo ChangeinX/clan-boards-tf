@@ -134,6 +134,34 @@ resource "aws_secretsmanager_secret_version" "coc_api_token" {
 }
 
 
+resource "aws_secretsmanager_secret" "aws_region" {
+  name = "${var.app_name}-aws-region"
+}
+
+resource "aws_secretsmanager_secret_version" "aws_region" {
+  secret_id     = aws_secretsmanager_secret.aws_region.id
+  secret_string = var.region
+}
+
+resource "aws_secretsmanager_secret" "messages_table" {
+  name = "${var.app_name}-messages-table"
+}
+
+resource "aws_secretsmanager_secret_version" "messages_table" {
+  secret_id     = aws_secretsmanager_secret.messages_table.id
+  secret_string = var.messages_table
+}
+
+resource "aws_secretsmanager_secret" "appsync_events_url" {
+  name = "${var.app_name}-appsync-events-url"
+}
+
+resource "aws_secretsmanager_secret_version" "appsync_events_url" {
+  secret_id     = aws_secretsmanager_secret.appsync_events_url.id
+  secret_string = var.appsync_events_url
+}
+
+
 resource "aws_secretsmanager_secret" "google_client_id" {
   name = "${var.app_name}-google-client-id"
 }
@@ -164,8 +192,10 @@ resource "aws_iam_role_policy" "execution_secrets" {
       Resource = [
         aws_secretsmanager_secret.app_env.arn,
         aws_secretsmanager_secret.database_url.arn,
-        aws_secretsmanager_secret.secret_key.arn
-        , aws_secretsmanager_secret.coc_api_token.arn,
+        aws_secretsmanager_secret.secret_key.arn,
+        aws_secretsmanager_secret.aws_region.arn,
+        aws_secretsmanager_secret.messages_table.arn,
+        aws_secretsmanager_secret.appsync_events_url.arn,
         aws_secretsmanager_secret.google_client_id.arn,
         aws_secretsmanager_secret.google_client_secret.arn
       ]
@@ -258,8 +288,16 @@ resource "aws_ecs_task_definition" "worker" {
           valueFrom = aws_secretsmanager_secret.secret_key.arn
         },
         {
-          name      = "COC_API_TOKEN"
-          valueFrom = aws_secretsmanager_secret.coc_api_token.arn
+          name      = "AWS_REGION"
+          valueFrom = aws_secretsmanager_secret.aws_region.arn
+        },
+        {
+          name      = "MESSAGES_TABLE"
+          valueFrom = aws_secretsmanager_secret.messages_table.arn
+        },
+        {
+          name      = "APPSYNC_EVENTS_URL"
+          valueFrom = aws_secretsmanager_secret.appsync_events_url.arn
         },
         {
           name      = "GOOGLE_CLIENT_ID"

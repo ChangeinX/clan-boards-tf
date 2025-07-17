@@ -41,3 +41,7 @@ output "chat_api_url" {
 output "chat_table_name" {
   value = module.chat.table_name
 }
+
+output "chat_events_url" {
+  value = module.chat.events_url
+}
