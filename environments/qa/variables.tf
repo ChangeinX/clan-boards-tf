@@ -61,6 +61,12 @@ variable "api_host" {
   default     = null
 }
 
+variable "messages_host" {
+  description = "Hostname for the messages listener rule"
+  type        = string
+  default     = null
+}
+
 
 
 variable "static_ip_image" {

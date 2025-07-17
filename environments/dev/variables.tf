@@ -60,6 +60,12 @@ variable "api_host" {
   type        = string
   default     = null
 }
+variable "messages_host" {
+  description = "Hostname for the messages listener rule"
+  type        = string
+  default     = null
+}
+
 
 
 

@@ -125,3 +125,19 @@ resource "aws_lb_listener_rule" "api" {
     }
   }
 }
+resource "aws_lb_listener_rule" "messages" {
+  count        = var.messages_host == null ? 0 : 1
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 110
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.messages.arn
+  }
+
+  condition {
+    host_header {
+      values = [var.messages_host]
+    }
+  }
+}
