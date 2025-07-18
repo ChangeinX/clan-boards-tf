@@ -17,3 +17,19 @@ output "events_url" {
 output "table_arn" {
   value = aws_dynamodb_table.messages.arn
 }
+
+output "event_api_http_endpoint" {
+  value = aws_appsync_api.chat_event.uris["EVENT_HTTP"]
+}
+
+output "event_api_arn" {
+  value = aws_appsync_api.chat_event.arn
+}
+
+output "event_namespace" {
+  value = aws_appsync_channel_namespace.chat_groups.name
+}
+
+output "event_namespace_arn" {
+  value = aws_appsync_channel_namespace.chat_groups.arn
+}

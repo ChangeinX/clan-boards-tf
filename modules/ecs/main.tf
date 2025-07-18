@@ -106,6 +106,23 @@ resource "aws_iam_role_policy" "messages_table" {
   })
 }
 
+resource "aws_iam_policy" "event_publish" {
+  name   = "ChatEventPublish"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "appsync:EventPublish"
+      Resource = "${var.event_api_arn}/*"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_event_publish" {
+  role       = aws_iam_role.task_with_db.name
+  policy_arn = aws_iam_policy.event_publish.arn
+}
+
 # Secrets
 resource "aws_secretsmanager_secret" "app_env" {
   name = "${var.app_name}-app-env"

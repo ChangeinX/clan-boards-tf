@@ -79,6 +79,29 @@ resource "aws_appsync_graphql_api" "chat" {
   xray_enabled = true
 }
 
+# Event API for SigV4/IAM and OIDC access
+resource "aws_appsync_api" "chat_event" {
+  name     = "${var.app_name}-chat-event"
+  api_type = "EVENT"
+
+  event_config {
+    auth_providers            = ["AWS_IAM", "OPENID_CONNECT"]
+    connection_auth_modes     = [{ authType = "OPENID_CONNECT" }, { authType = "AWS_IAM" }]
+    default_publish_auth_modes = [{ authType = "AWS_IAM" }]
+
+    openid_connect_config {
+      issuer    = "https://accounts.google.com"
+      client_id = var.google_client_id
+    }
+  }
+}
+
+# Namespace for event channels
+resource "aws_appsync_channel_namespace" "chat_groups" {
+  api_id = aws_appsync_api.chat_event.id
+  name   = "groups"
+}
+
 resource "aws_appsync_datasource" "messages" {
   api_id           = aws_appsync_graphql_api.chat.id
   name             = "MessagesTable"
@@ -125,4 +148,11 @@ resource "aws_appsync_domain_name_api_association" "this" {
   count       = var.domain_name == null ? 0 : 1
   domain_name = aws_appsync_domain_name.this[0].domain_name
   api_id      = aws_appsync_graphql_api.chat.id
+}
+
+resource "aws_appsync_domain_name_api_association" "event" {
+  count       = var.domain_name == null ? 0 : 1
+  domain_name = aws_appsync_domain_name.this[0].domain_name
+  api_id      = aws_appsync_api.chat_event.id
+  api_type    = "EVENT"
 }

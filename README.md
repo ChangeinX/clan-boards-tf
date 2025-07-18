@@ -55,7 +55,7 @@ tofu init
 tofu apply
 ```
 
-The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the AppSync chat API and events URLs.
+The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the AppSync chat API, events URL, event API HTTP endpoint and namespace.
 
 Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 

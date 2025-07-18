@@ -47,6 +47,7 @@ module "ecs" {
   messages_table            = module.chat.table_name
   messages_table_arn        = module.chat.table_arn
   appsync_events_url        = module.chat.events_url
+  event_api_arn             = module.chat.event_api_arn
   coc_api_token             = var.coc_api_token
   google_client_id          = var.google_client_id
   google_client_secret      = var.google_client_secret

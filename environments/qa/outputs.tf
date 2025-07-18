@@ -45,3 +45,19 @@ output "chat_table_name" {
 output "chat_events_url" {
   value = module.chat.events_url
 }
+
+output "event_api_http_endpoint" {
+  value = module.chat.event_api_http_endpoint
+}
+
+output "event_api_arn" {
+  value = module.chat.event_api_arn
+}
+
+output "event_namespace" {
+  value = module.chat.event_namespace
+}
+
+output "event_namespace_arn" {
+  value = module.chat.event_namespace_arn
+}
