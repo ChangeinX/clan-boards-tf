@@ -99,8 +99,11 @@ resource "aws_iam_role_policy" "messages_table" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = ["dynamodb:PutItem"],
+      Effect = "Allow",
+      Action = [
+        "dynamodb:PutItem",
+        "dynamodb:Query"
+      ],
       Resource = var.messages_table_arn
     }]
   })
