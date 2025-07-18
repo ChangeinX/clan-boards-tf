@@ -80,7 +80,7 @@ resource "aws_appsync_graphql_api" "chat" {
 }
 
 # Event API for SigV4/IAM and OIDC access
-resource "aws_appsync_api" "chat_event" {
+resource "aws_appsync_graphql_api" "chat_event" {
   name     = "${var.app_name}-chat-event"
   api_type = "EVENT"
 
@@ -98,7 +98,7 @@ resource "aws_appsync_api" "chat_event" {
 
 # Namespace for event channels
 resource "aws_appsync_channel_namespace" "chat_groups" {
-  api_id = aws_appsync_api.chat_event.id
+  api_id = aws_appsync_graphql_api.chat_event.id
   name   = "groups"
 }
 
@@ -153,6 +153,6 @@ resource "aws_appsync_domain_name_api_association" "this" {
 resource "aws_appsync_domain_name_api_association" "event" {
   count       = var.domain_name == null ? 0 : 1
   domain_name = aws_appsync_domain_name.this[0].domain_name
-  api_id      = aws_appsync_api.chat_event.id
+  api_id      = aws_appsync_graphql_api.chat_event.id
   api_type    = "EVENT"
 }
