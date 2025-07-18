@@ -106,6 +106,20 @@ resource "aws_iam_role_policy" "messages_table" {
   })
 }
 
+resource "aws_iam_role_policy" "appsync_access" {
+  name = "${var.app_name}-appsync-access"
+  role = aws_iam_role.task_with_db.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = ["appsync:GraphQL"],
+      Resource = "${var.appsync_api_arn}/*"
+    }]
+  })
+}
+
 # Secrets
 resource "aws_secretsmanager_secret" "app_env" {
   name = "${var.app_name}-app-env"

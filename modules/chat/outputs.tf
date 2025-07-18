@@ -17,3 +17,7 @@ output "events_url" {
 output "table_arn" {
   value = aws_dynamodb_table.messages.arn
 }
+
+output "api_arn" {
+  value = aws_appsync_graphql_api.chat.arn
+}
