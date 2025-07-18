@@ -12,7 +12,6 @@ This configuration provisions an AWS environment for a containerized web applica
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
 - `chat` provisions an AppSync API secured with Google Sign-In and a DynamoDB table to store messages. It outputs the table name and ARN for use in IAM policies and can optionally be accessed from a custom domain by providing a certificate and hostname.
-  Publishing chat messages must use the `events_url` output which always points to the realtime endpoint, while GraphQL queries and subscriptions may use the custom domain or `api_url`.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
 ## Usage
@@ -57,7 +56,6 @@ tofu apply
 ```
 
 The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the AppSync chat API and events URLs.
-Publishing must use the realtime `events_url` value. Queries and subscriptions can point DNS at the API URL if a custom domain is configured.
 
 Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 
