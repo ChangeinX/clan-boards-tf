@@ -18,6 +18,7 @@ variable "sync_base" { type = string }
 variable "messages_table" { type = string }
 variable "messages_table_arn" { type = string }
 variable "appsync_events_url" { type = string }
+variable "appsync_api_arn" { type = string }
 
 variable "coc_api_token" { type = string }
 

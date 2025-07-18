@@ -62,14 +62,9 @@ resource "aws_iam_role_policy_attachment" "logs" {
 
 resource "aws_appsync_graphql_api" "chat" {
   name                = "${var.app_name}-chat"
-  authentication_type = "OPENID_CONNECT"
+  authentication_type = "AWS_IAM"
 
   schema = file("${path.module}/schema.graphql")
-
-  openid_connect_config {
-    issuer    = "https://accounts.google.com"
-    client_id = var.google_client_id
-  }
 
   log_config {
     field_log_level          = "ERROR"
