@@ -34,14 +34,6 @@ output "frontend_distribution_id" {
   value = module.frontend.distribution_id
 }
 
-output "chat_api_url" {
-  value = module.chat.api_url
-}
-
 output "chat_table_name" {
   value = module.chat.table_name
-}
-
-output "chat_events_url" {
-  value = module.chat.events_url
 }

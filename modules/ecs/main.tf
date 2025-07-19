@@ -109,19 +109,6 @@ resource "aws_iam_role_policy" "messages_table" {
   })
 }
 
-resource "aws_iam_role_policy" "appsync_access" {
-  name = "${var.app_name}-appsync-access"
-  role = aws_iam_role.task_with_db.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = ["appsync:GraphQL"],
-      Resource = "${var.appsync_api_arn}/*"
-    }]
-  })
-}
 
 # Secrets
 resource "aws_secretsmanager_secret" "app_env" {
@@ -185,14 +172,6 @@ resource "aws_secretsmanager_secret_version" "messages_table" {
   secret_string = var.messages_table
 }
 
-resource "aws_secretsmanager_secret" "appsync_events_url" {
-  name = "${var.app_name}-appsync-events-url"
-}
-
-resource "aws_secretsmanager_secret_version" "appsync_events_url" {
-  secret_id     = aws_secretsmanager_secret.appsync_events_url.id
-  secret_string = var.appsync_events_url
-}
 
 
 resource "aws_secretsmanager_secret" "google_client_id" {
@@ -228,7 +207,6 @@ resource "aws_iam_role_policy" "execution_secrets" {
         aws_secretsmanager_secret.secret_key.arn,
         aws_secretsmanager_secret.aws_region.arn,
         aws_secretsmanager_secret.messages_table.arn,
-        aws_secretsmanager_secret.appsync_events_url.arn,
         aws_secretsmanager_secret.coc_api_token.arn,
         aws_secretsmanager_secret.google_client_id.arn,
         aws_secretsmanager_secret.google_client_secret.arn
@@ -467,10 +445,6 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "MESSAGES_TABLE"
           valueFrom = aws_secretsmanager_secret.messages_table.arn
-        },
-        {
-          name      = "APPSYNC_EVENTS_URL"
-          valueFrom = aws_secretsmanager_secret.appsync_events_url.arn
         },
         {
           name      = "GOOGLE_CLIENT_ID"
