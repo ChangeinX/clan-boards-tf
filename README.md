@@ -11,7 +11,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`. It now requires the DynamoDB table ARN so tasks can read and write the chat table.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
-- `chat` provisions an AppSync API secured with IAM (SigV4) and a DynamoDB table to store messages. It outputs the table name, ARN and API ARN for use in IAM policies and can optionally be accessed from a custom domain by providing a certificate and hostname.
+- `chat` provisions a DynamoDB table used for the chat service. It outputs the table name and ARN for other modules.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
 ## Usage
@@ -34,8 +34,6 @@ backend_dynamodb_table = "<dynamodb table for locking>"
 frontend_bucket_name = "<s3 bucket for frontend>"
 frontend_domain_names = ["app.example.com"]
 frontend_certificate_arn = "<acm cert arn for frontend>"
-chat_domain_name = "chat.example.com"
-chat_certificate_arn = "<acm cert arn for chat>"
 ```
 
 2. Create the state bucket and DynamoDB table using the helper script. The
@@ -55,7 +53,7 @@ tofu init
 tofu apply
 ```
 
-The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the AppSync chat API and events URLs.
+The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the chat table name.
 
 Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 

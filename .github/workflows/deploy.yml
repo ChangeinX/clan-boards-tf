@@ -47,8 +47,6 @@ jobs:
           frontend_domain_names   = ["${{ secrets.FRONTEND_DOMAIN_NAMES }}"]
           frontend_certificate_arn = "${{ secrets.CERTIFICATE_ARN }}"
           messages_image = "${{ secrets.MESSAGES_IMAGE }}"
-          chat_domain_name = "${{ secrets.CHAT_DOMAIN_NAME }}"
-          chat_certificate_arn = "${{ secrets.CHAT_CERTIFICATE_ARN }}"
           EOF
         shell: bash
       - name: Initialize

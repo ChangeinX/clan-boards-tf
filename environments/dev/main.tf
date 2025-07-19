@@ -46,8 +46,6 @@ module "ecs" {
   sync_base                 = "http://static.${var.app_name}.local:8000/sync"
   messages_table            = module.chat.table_name
   messages_table_arn        = module.chat.table_arn
-  appsync_events_url        = module.chat.events_url
-  appsync_api_arn           = module.chat.api_arn
   coc_api_token             = var.coc_api_token
   google_client_id          = var.google_client_id
   google_client_secret      = var.google_client_secret
@@ -80,8 +78,6 @@ module "frontend" {
 }
 
 module "chat" {
-  source          = "../../modules/chat"
-  app_name        = var.app_name
-  domain_name     = var.chat_domain_name
-  certificate_arn = var.chat_certificate_arn
+  source   = "../../modules/chat"
+  app_name = var.app_name
 }
