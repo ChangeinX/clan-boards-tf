@@ -13,13 +13,13 @@ provider "aws" {
 }
 
 module "networking" {
-  source   = "../../modules/networking"
+  source   = "../networking"
   region   = var.region
   app_name = var.app_name
 }
 
 module "alb" {
-  source            = "../../modules/alb"
+  source            = "../alb"
   app_name          = var.app_name
   vpc_id            = module.networking.vpc_id
   public_subnet_ids = module.networking.public_subnet_ids
@@ -28,7 +28,7 @@ module "alb" {
 }
 
 module "ecs" {
-  source                    = "../../modules/ecs"
+  source                    = "../ecs"
   app_name                  = var.app_name
   vpc_id                    = module.networking.vpc_id
   subnet_ids                = module.networking.private_subnet_ids
@@ -53,7 +53,7 @@ module "ecs" {
 }
 
 module "rds" {
-  source             = "../../modules/rds"
+  source             = "../rds"
   app_name           = var.app_name
   vpc_id             = module.networking.vpc_id
   private_subnet_ids = module.networking.public_subnet_ids
@@ -64,20 +64,20 @@ module "rds" {
 
 
 module "nat_gateway" {
-  source                 = "../../modules/nat_gateway"
+  source                 = "../nat_gateway"
   app_name               = var.app_name
   subnet_id              = module.networking.public_subnet_ids[0]
   private_route_table_id = module.networking.private_route_table_id
 }
 
 module "frontend" {
-  source          = "../../modules/frontend"
+  source          = "../frontend"
   bucket_name     = var.frontend_bucket_name
   domain_names    = var.frontend_domain_names
   certificate_arn = var.frontend_certificate_arn
 }
 
 module "chat" {
-  source   = "../../modules/chat"
+  source   = "../chat"
   app_name = var.app_name
 }

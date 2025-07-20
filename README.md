@@ -45,12 +45,12 @@ frontend_certificate_arn = "<acm cert arn for frontend>"
 The script enables versioning, default encryption and blocks public access on
 the bucket.
 
-3. Initialize and apply the configuration from one of the environment directories using [OpenTofu](https://opentofu.org/):
+3. Initialize and apply the configuration for an environment using [Terragrunt](https://terragrunt.gruntwork.io/):
 
 ```bash
 cd environments/dev
-tofu init
-tofu apply
+terragrunt init
+terragrunt apply
 ```
 
 The outputs will display the ALB DNS name, database endpoint, the NAT gateway's public IP and the chat table name.
@@ -58,19 +58,19 @@ The outputs will display the ALB DNS name, database endpoint, the NAT gateway's 
 Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 
 ## Environments
-Separate Terraform roots are provided under `environments/dev`, `environments/qa` and `environments/prod`. Each folder uses its own state prefix so the stages are isolated.
+Terragrunt configurations live under `environments/dev`, `environments/qa` and `environments/prod`. Each folder uses its own state prefix so the stages are isolated.
 
-Run Terraform from the desired environment directory, for example:
+Run Terragrunt from the desired environment directory, for example:
 
 ```bash
 cd environments/dev
-terraform init
-terraform apply
+terragrunt init
+terragrunt apply
 ```
 
 
 ## Continuous Integration
-GitHub Actions validate the configuration on every pull request. Formatting and validation are run with OpenTofu.
+GitHub Actions validate the configuration on every pull request using Terragrunt and OpenTofu for formatting and validation.
 
 Pushing to `main` automatically applies the configuration for the `dev` environment. Tags matching `qa-*` or `prod-*` trigger deployments to `qa` and `prod`.
 

@@ -12,10 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: opentofu/setup-opentofu@v1
-      - name: Format
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION=0.83.2
+          wget -q https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64 -O terragrunt
+          chmod +x terragrunt
+          sudo mv terragrunt /usr/local/bin/terragrunt
+      - name: Format Terraform
         run: tofu fmt -check -recursive
+      - name: Format Terragrunt
+        run: terragrunt hclfmt --terragrunt-check
       - name: Initialize
-        run: cd ${{ matrix.dir }} && tofu init -backend=false
+        run: cd ${{ matrix.dir }} && terragrunt init -backend=false --terragrunt-non-interactive
+        env:
+          TERRAGRUNT_TFPATH: tofu
       - name: Validate
-        run: cd ${{ matrix.dir }} && tofu validate
+        run: cd ${{ matrix.dir }} && terragrunt validate --terragrunt-non-interactive
+        env:
+          TERRAGRUNT_TFPATH: tofu
 

@@ -14,6 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: opentofu/setup-opentofu@v1
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION=0.83.2
+          wget -q https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64 -O terragrunt
+          chmod +x terragrunt
+          sudo mv terragrunt /usr/local/bin/terragrunt
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -50,7 +56,11 @@ jobs:
           EOF
         shell: bash
       - name: Initialize
-        run: cd environments/$ENVIRONMENT && tofu init -input=false
+        run: cd environments/$ENVIRONMENT && terragrunt init -input=false --terragrunt-non-interactive
+        env:
+          TERRAGRUNT_TFPATH: tofu
       - name: Apply
-        run: cd environments/$ENVIRONMENT && tofu apply -auto-approve -input=false
+        run: cd environments/$ENVIRONMENT && terragrunt apply -auto-approve -input=false --terragrunt-non-interactive
+        env:
+          TERRAGRUNT_TFPATH: tofu
 
