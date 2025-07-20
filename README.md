@@ -45,9 +45,11 @@ frontend_certificate_arn = "<acm cert arn for frontend>"
 The script enables versioning, default encryption and blocks public access on
 the bucket.
 
-3. Initialize and apply the configuration for an environment using [Terragrunt](https://terragrunt.gruntwork.io/):
+3. Export the backend variables and apply the configuration for an environment using [Terragrunt](https://terragrunt.gruntwork.io/):
 
 ```bash
+export TF_BACKEND_BUCKET=<backend bucket>
+export TF_BACKEND_TABLE=<backend dynamodb table>
 cd environments/dev
 terragrunt init
 terragrunt apply

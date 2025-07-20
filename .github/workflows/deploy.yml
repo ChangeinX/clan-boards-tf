@@ -11,6 +11,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      TF_BACKEND_BUCKET: ${{ secrets.BACKEND_BUCKET }}
+      TF_BACKEND_TABLE: ${{ secrets.BACKEND_DYNAMODB_TABLE }}
     steps:
       - uses: actions/checkout@v3
       - uses: opentofu/setup-opentofu@v1
