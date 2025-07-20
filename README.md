@@ -31,6 +31,7 @@ google_client_id = "<google oauth client id>"
 google_client_secret = "<google oauth client secret>"
 backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
+env = "dev"
 frontend_bucket_name = "<s3 bucket for frontend>"
 frontend_domain_names = ["app.example.com"]
 frontend_certificate_arn = "<acm cert arn for frontend>"

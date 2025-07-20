@@ -4,6 +4,11 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "env" {
+  description = "Deployment environment name"
+  type        = string
+}
+
 variable "app_name" {
   description = "Name prefix for resources"
   type        = string
