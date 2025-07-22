@@ -8,12 +8,13 @@ This configuration provisions an AWS environment for a containerized web applica
   container images without internet access
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
-- `ecs` sets up the ECS cluster, task definitions and services, CloudWatch log groups and Secrets Manager entries. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`. It now requires the DynamoDB table ARN so tasks can read and write the chat table.
+- `secrets` stores application configuration in Secrets Manager for the ECS tasks.
+- `ecs` sets up the ECS cluster, task definitions and services. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`. It now requires the DynamoDB table ARN and secret ARNs so tasks can read and write the chat table.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
 - `chat` provisions a DynamoDB table used for the chat service. It outputs the table name and ARN for other modules.
 
-Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker talks to the sync service at `static.<app_name>.local`.
+Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker and static tasks also load `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the sync service at `static.<app_name>.local`.
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:
 
