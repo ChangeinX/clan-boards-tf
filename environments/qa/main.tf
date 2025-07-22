@@ -27,6 +27,24 @@ module "alb" {
   api_host          = var.api_host
 }
 
+module "chat" {
+  source   = "../../modules/chat"
+  app_name = var.app_name
+}
+
+module "secrets" {
+  source               = "../../modules/secrets"
+  app_name             = var.app_name
+  region               = var.region
+  app_env              = var.app_env
+  db_endpoint          = module.rds.db_endpoint
+  db_password          = var.db_password
+  messages_table       = module.chat.table_name
+  coc_api_token        = var.coc_api_token
+  google_client_id     = var.google_client_id
+  google_client_secret = var.google_client_secret
+}
+
 module "ecs" {
   source                    = "../../modules/ecs"
   app_name                  = var.app_name
@@ -40,15 +58,16 @@ module "ecs" {
   worker_image              = var.worker_image
   static_ip_image           = var.static_ip_image
   messages_image            = var.messages_image
-  app_env                   = var.app_env
-  db_endpoint               = module.rds.db_endpoint
-  db_password               = var.db_password
   sync_base                 = "http://static.${var.app_name}.local:8000/sync"
-  messages_table            = module.chat.table_name
   messages_table_arn        = module.chat.table_arn
-  coc_api_token             = var.coc_api_token
-  google_client_id          = var.google_client_id
-  google_client_secret      = var.google_client_secret
+  app_env_arn               = module.secrets.app_env_arn
+  database_url_arn          = module.secrets.database_url_arn
+  secret_key_arn            = module.secrets.secret_key_arn
+  aws_region_arn            = module.secrets.aws_region_arn
+  messages_table_secret_arn = module.secrets.messages_table_secret_arn
+  coc_api_token_arn         = module.secrets.coc_api_token_arn
+  google_client_id_arn      = module.secrets.google_client_id_arn
+  google_client_secret_arn  = module.secrets.google_client_secret_arn
   depends_on                = [module.alb]
 }
 
@@ -75,9 +94,4 @@ module "frontend" {
   bucket_name     = var.frontend_bucket_name
   domain_names    = var.frontend_domain_names
   certificate_arn = var.frontend_certificate_arn
-}
-
-module "chat" {
-  source   = "../../modules/chat"
-  app_name = var.app_name
 }

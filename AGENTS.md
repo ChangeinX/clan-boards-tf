@@ -1,15 +1,16 @@
 # Guidelines for Codex
 
-This repository contains OpenTofu code for deploying AWS infrastructure.
+This repository contains `OpenTofu` code for deploying AWS infrastructure. 
+You have tofu installed, but no access to deployed resources.
 
 ## Development Guidelines
 - Use 2 spaces for indentation in all `.tf` files.
-- Format configuration with `terraform fmt -recursive` before committing.
+- Format configuration with `tofu fmt -recursive` before committing.
 - Validate configuration using:
   ```bash
-  terraform init -backend=false
-  terraform fmt -check -recursive
-  terraform validate
+  tofu init -backend=false
+  tofu fmt -check -recursive
+  tofu validate
   ```
 
 - Do not modify `.terraform.lock.hcl`.
@@ -22,4 +23,4 @@ This repository contains OpenTofu code for deploying AWS infrastructure.
 
 ## Pull Requests
 - In the PR description, summarize what changed.
-- Mention that `terraform fmt` and `terraform validate` were run.
+- Mention that `tofu fmt` and `tofu validate` were run.

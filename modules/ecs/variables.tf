@@ -9,16 +9,15 @@ variable "region" { type = string }
 variable "worker_image" { type = string }
 variable "static_ip_image" { type = string }
 variable "messages_image" { type = string }
-variable "app_env" { type = string }
-variable "db_endpoint" { type = string }
-variable "db_password" { type = string }
 
 variable "sync_base" { type = string }
-
-variable "messages_table" { type = string }
 variable "messages_table_arn" { type = string }
 
-variable "coc_api_token" { type = string }
-
-variable "google_client_id" { type = string }
-variable "google_client_secret" { type = string }
+variable "app_env_arn" { type = string }
+variable "database_url_arn" { type = string }
+variable "secret_key_arn" { type = string }
+variable "aws_region_arn" { type = string }
+variable "messages_table_secret_arn" { type = string }
+variable "coc_api_token_arn" { type = string }
+variable "google_client_id_arn" { type = string }
+variable "google_client_secret_arn" { type = string }
