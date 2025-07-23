@@ -73,7 +73,6 @@ terraform init
 terraform apply
 ```
 
-
 ## Continuous Integration
 GitHub Actions validate the configuration on every pull request. Formatting and validation are run with OpenTofu.
 

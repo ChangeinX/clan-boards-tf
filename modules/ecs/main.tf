@@ -127,6 +127,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.secret_key_arn,
         var.aws_region_arn,
         var.messages_table_secret_arn,
+        var.chat_table_secret_arn,
         var.coc_api_token_arn,
         var.google_client_id_arn,
         var.google_client_secret_arn,
@@ -382,6 +383,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "MESSAGES_TABLE"
           valueFrom = var.messages_table_secret_arn
+        },
+        {
+          name      = "CHAT_TABLE"
+          valueFrom = var.chat_table_secret_arn
         },
         {
           name      = "GOOGLE_CLIENT_ID"
