@@ -22,6 +22,10 @@ output "messages_table_secret_arn" {
   value = aws_secretsmanager_secret.messages_table.arn
 }
 
+output "chat_table_secret_arn" {
+  value = aws_secretsmanager_secret.chat_table.arn
+}
+
 output "google_client_id_arn" {
   value = aws_secretsmanager_secret.google_client_id.arn
 }

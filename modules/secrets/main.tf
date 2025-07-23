@@ -57,6 +57,15 @@ resource "aws_secretsmanager_secret_version" "messages_table" {
   secret_string = var.messages_table
 }
 
+resource "aws_secretsmanager_secret" "chat_table" {
+  name = "${var.app_name}-chat-v2-table"
+}
+
+resource "aws_secretsmanager_secret_version" "chat_table" {
+  secret_id     = aws_secretsmanager_secret.chat_table.id
+  secret_string = var.chat_table
+}
+
 resource "aws_secretsmanager_secret" "google_client_id" {
   name = "${var.app_name}-google-client-id"
 }

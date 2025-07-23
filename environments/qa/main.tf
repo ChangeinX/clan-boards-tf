@@ -40,6 +40,7 @@ module "secrets" {
   db_endpoint          = module.rds.db_endpoint
   db_password          = var.db_password
   messages_table       = module.chat.table_name
+  chat_table           = module.chat.v2_table_name
   coc_api_token        = var.coc_api_token
   google_client_id     = var.google_client_id
   google_client_secret = var.google_client_secret
@@ -65,6 +66,7 @@ module "ecs" {
   secret_key_arn            = module.secrets.secret_key_arn
   aws_region_arn            = module.secrets.aws_region_arn
   messages_table_secret_arn = module.secrets.messages_table_secret_arn
+  chat_table_secret_arn     = module.secrets.chat_table_secret_arn
   coc_api_token_arn         = module.secrets.coc_api_token_arn
   google_client_id_arn      = module.secrets.google_client_id_arn
   google_client_secret_arn  = module.secrets.google_client_secret_arn
