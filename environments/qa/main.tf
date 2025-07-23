@@ -40,7 +40,7 @@ module "secrets" {
   db_endpoint          = module.rds.db_endpoint
   db_password          = var.db_password
   messages_table       = module.chat.table_name
-  chat_table           = module.chat.v2_table_name
+  chat_table           = module.chat.chat_table_name
   coc_api_token        = var.coc_api_token
   google_client_id     = var.google_client_id
   google_client_secret = var.google_client_secret
