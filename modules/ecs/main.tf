@@ -104,7 +104,7 @@ resource "aws_iam_role_policy" "messages_table" {
         "dynamodb:PutItem",
         "dynamodb:Query"
       ],
-      Resource = var.messages_table_arn
+      Resource = [var.messages_table_arn, var.chat_table_arn]
     }]
   })
 }

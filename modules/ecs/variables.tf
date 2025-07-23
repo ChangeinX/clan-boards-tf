@@ -12,6 +12,7 @@ variable "messages_image" { type = string }
 
 variable "sync_base" { type = string }
 variable "messages_table_arn" { type = string }
+variable "chat_table_arn" { type = string }
 
 variable "app_env_arn" { type = string }
 variable "database_url_arn" { type = string }

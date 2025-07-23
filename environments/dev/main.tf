@@ -60,6 +60,7 @@ module "ecs" {
   messages_image            = var.messages_image
   sync_base                 = "http://static.${var.app_name}.local:8000/sync"
   messages_table_arn        = module.chat.table_arn
+  chat_table_arn            = module.chat.chat_table_arn
   app_env_arn               = module.secrets.app_env_arn
   database_url_arn          = module.secrets.database_url_arn
   secret_key_arn            = module.secrets.secret_key_arn
