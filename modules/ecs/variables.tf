@@ -4,13 +4,13 @@ variable "subnet_ids" { type = list(string) }
 variable "alb_sg_id" { type = string }
 variable "worker_target_group_arn" { type = string }
 variable "messages_target_group_arn" { type = string }
+variable "user_target_group_arn" { type = string }
 variable "listener_arn" { type = string }
 variable "region" { type = string }
 variable "worker_image" { type = string }
-variable "static_ip_image" { type = string }
+variable "user_image" { type = string }
 variable "messages_image" { type = string }
 
-variable "sync_base" { type = string }
 variable "messages_table_arn" { type = string }
 variable "chat_table_arn" { type = string }
 

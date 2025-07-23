@@ -28,11 +28,19 @@ resource "aws_security_group" "ecs" {
     security_groups = [var.alb_sg_id]
   }
 
-  # allow internal access to the static service
+  # allow traffic from the ALB to the user service
+  ingress {
+    protocol        = "tcp"
+    from_port       = 8020
+    to_port         = 8020
+    security_groups = [var.alb_sg_id]
+  }
+
+  # allow internal access to the user service
   ingress {
     protocol  = "tcp"
-    from_port = 8000
-    to_port   = 8000
+    from_port = 8020
+    to_port   = 8020
     self      = true
   }
 
@@ -49,8 +57,8 @@ resource "aws_cloudwatch_log_group" "worker" {
   name = "/ecs/${var.app_name}-worker"
 }
 
-resource "aws_cloudwatch_log_group" "static" {
-  name = "/ecs/${var.app_name}-static"
+resource "aws_cloudwatch_log_group" "user" {
+  name = "/ecs/${var.app_name}-user"
 }
 
 resource "aws_cloudwatch_log_group" "messages" {
@@ -109,6 +117,35 @@ resource "aws_iam_role_policy" "messages_table" {
   })
 }
 
+resource "aws_iam_role" "task_dynamo" {
+  name = "${var.app_name}-task-dynamo"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action    = "sts:AssumeRole",
+      Effect    = "Allow",
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "user_dynamo" {
+  name = "${var.app_name}-user-dynamo"
+  role = aws_iam_role.task_dynamo.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = [
+        "dynamodb:PutItem",
+        "dynamodb:Query"
+      ],
+      Resource = [var.messages_table_arn, var.chat_table_arn]
+    }]
+  })
+}
+
 
 # Secrets
 
@@ -148,8 +185,8 @@ resource "aws_service_discovery_private_dns_namespace" "this" {
   vpc  = var.vpc_id
 }
 
-resource "aws_service_discovery_service" "static" {
-  name = "static"
+resource "aws_service_discovery_service" "user" {
+  name = "user"
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.this.id
     dns_records {
@@ -194,10 +231,6 @@ resource "aws_ecs_task_definition" "worker" {
         {
           name  = "PORT"
           value = "8001"
-        },
-        {
-          name  = "SYNC_BASE"
-          value = var.sync_base
         }
       ]
       logConfiguration = {
@@ -250,9 +283,9 @@ resource "aws_ecs_task_definition" "worker" {
   }
 }
 
-# Task definition for the static sync service
-resource "aws_ecs_task_definition" "static" {
-  family                   = "${var.app_name}-static"
+# Task definition for the user service
+resource "aws_ecs_task_definition" "user" {
+  family                   = "${var.app_name}-user"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
@@ -263,41 +296,53 @@ resource "aws_ecs_task_definition" "static" {
   }
 
   execution_role_arn = aws_iam_role.task_execution.arn
-  task_role_arn      = aws_iam_role.task_with_db.arn
+  task_role_arn      = aws_iam_role.task_dynamo.arn
 
   container_definitions = jsonencode([
     {
-      name      = "static"
-      image     = var.static_ip_image
+      name      = "user"
+      image     = var.user_image
       essential = true
       portMappings = [
         {
-          containerPort = 8000
-          hostPort      = 8000
+          containerPort = 8020
+          hostPort      = 8020
         }
       ]
       environment = [
         {
           name  = "PORT"
-          value = "8000"
+          value = "8020"
         }
       ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.static.name
+          awslogs-group         = aws_cloudwatch_log_group.user.name
           awslogs-region        = var.region
-          awslogs-stream-prefix = "static"
+          awslogs-stream-prefix = "user"
         }
       }
       secrets = [
         {
-          name      = "COC_API_TOKEN"
-          valueFrom = var.coc_api_token_arn
+          name      = "APP_ENV"
+          valueFrom = var.app_env_arn
         },
         {
-          name      = "DATABASE_URL"
-          valueFrom = var.database_url_arn
+          name      = "SECRET_KEY"
+          valueFrom = var.secret_key_arn
+        },
+        {
+          name      = "AWS_REGION"
+          valueFrom = var.aws_region_arn
+        },
+        {
+          name      = "MESSAGES_TABLE"
+          valueFrom = var.messages_table_secret_arn
+        },
+        {
+          name      = "CHAT_TABLE"
+          valueFrom = var.chat_table_secret_arn
         },
         {
           name      = "GOOGLE_CLIENT_ID"
@@ -306,14 +351,6 @@ resource "aws_ecs_task_definition" "static" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
-        },
-        {
-          name      = "COC_EMAIL"
-          valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_EMAIL::"
-        },
-        {
-          name      = "COC_PASSWORD"
-          valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_PASSWORD::"
         }
       ]
     }
@@ -431,11 +468,11 @@ resource "aws_ecs_service" "worker" {
   }
 }
 
-# Service running the static sync container
-resource "aws_ecs_service" "static" {
-  name            = "${var.app_name}-static-svc"
+# Service running the user container
+resource "aws_ecs_service" "user" {
+  name            = "${var.app_name}-user-svc"
   cluster         = aws_ecs_cluster.this.id
-  task_definition = aws_ecs_task_definition.static.arn
+  task_definition = aws_ecs_task_definition.user.arn
   desired_count   = 1
   launch_type     = "FARGATE"
   network_configuration {
@@ -444,8 +481,14 @@ resource "aws_ecs_service" "static" {
     assign_public_ip = false
   }
   service_registries {
-    registry_arn = aws_service_discovery_service.static.arn
+    registry_arn = aws_service_discovery_service.user.arn
   }
+  load_balancer {
+    target_group_arn = var.user_target_group_arn
+    container_name   = "user"
+    container_port   = 8020
+  }
+  depends_on = [var.listener_arn]
 
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
