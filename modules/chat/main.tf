@@ -18,31 +18,27 @@ resource "aws_dynamodb_table" "messages" {
 }
 
 resource "aws_dynamodb_table" "chat" {
-  name         = "${var.app_name}-chat-v2"
+  name         = "${var.app_name}-chat"
   billing_mode = "PAY_PER_REQUEST"
 
+  # ---------- primary key ----------
   hash_key  = "PK"
   range_key = "SK"
 
-  attribute {
-    name = "PK"
-    type = "S"
-  }
+  attribute { 
+    name = "PK"     
+    type = "S" 
+    }
+  attribute { 
+    name = "SK"     
+    type = "S" 
+    }
 
-  attribute {
-    name = "SK"
-    type = "S"
-  }
-
-  attribute {
-    name = "GSI1PK"
-    type = "S"
-  }
-
-  attribute {
-    name = "ttl"
-    type = "N"
-  }
+  # ---------- GSI to list a user’s chats ----------
+  attribute { 
+    name = "GSI1PK" 
+    type = "S" 
+    }
 
   global_secondary_index {
     name            = "GSI1"
@@ -51,8 +47,9 @@ resource "aws_dynamodb_table" "chat" {
     projection_type = "ALL"
   }
 
+  # ---------- TTL ----------
   ttl {
-    attribute_name = "ttl"
+    attribute_name = "ttl"   # epoch‑seconds field in your items
     enabled        = true
   }
 }
