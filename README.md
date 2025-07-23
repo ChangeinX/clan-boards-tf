@@ -9,7 +9,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `alb` provisions the Application Load Balancer and related security group
 - `rds` creates the Postgres database in the private subnets
 - `secrets` stores application configuration in Secrets Manager for the ECS tasks.
-- `ecs` sets up the ECS cluster, task definitions and services. The sync service is registered in Cloud Map so other tasks can reach it via `static.<app_name>.local`. It now requires both DynamoDB table ARNs and secret ARNs so tasks can read and write the chat tables.
+ - `ecs` sets up the ECS cluster, task definitions and services. The user service is registered in Cloud Map so other tasks can reach it via `user.<app_name>.local` and is exposed through the ALB at `/api/v1/friends`. It now requires both DynamoDB table ARNs and secret ARNs so tasks can read and write the chat tables.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
 - `chat` provisions two DynamoDB tables used for the chat service. The existing
@@ -17,13 +17,13 @@ This configuration provisions an AWS environment for a containerized web applica
   `${var.app_name}-chat-v2` is deployed alongside it to prepare for migration.
   The module outputs the names and ARNs for both tables.
 
-Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker and static tasks also load `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the sync service at `static.<app_name>.local`.
+Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker also loads `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the user service at `user.<app_name>.local` or through the ALB path `/api/v1/friends`.
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:
 
 ```hcl
 worker_image        = "<worker image>"
-static_ip_image     = "<sync service image>"
+user_image          = "<user service image>"
 messages_image      = "<messages service image>"
 db_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"

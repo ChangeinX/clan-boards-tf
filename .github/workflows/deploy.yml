@@ -32,7 +32,7 @@ jobs:
         run: |
           cat <<EOF > environments/$ENVIRONMENT/terraform.tfvars
           worker_image         = "${{ secrets.WORKER_IMAGE }}"
-          static_ip_image      = "${{ secrets.STATIC_IP_IMAGE }}"
+          user_image           = "${{ secrets.USER_IMAGE }}"
           db_allowed_ip        = "${{ secrets.DB_ALLOWED_IP }}"
           db_password          = "${{ secrets.DB_PASSWORD }}"
           certificate_arn      = "${{ secrets.CERTIFICATE_ARN }}"

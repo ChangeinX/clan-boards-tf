@@ -54,12 +54,12 @@ module "ecs" {
   alb_sg_id                 = module.alb.alb_sg_id
   worker_target_group_arn   = module.alb.api_target_group_arn
   messages_target_group_arn = module.alb.messages_target_group_arn
+  user_target_group_arn     = module.alb.user_target_group_arn
   listener_arn              = module.alb.https_listener_arn
   region                    = var.region
   worker_image              = var.worker_image
-  static_ip_image           = var.static_ip_image
+  user_image                = var.user_image
   messages_image            = var.messages_image
-  sync_base                 = "http://static.${var.app_name}.local:8000/sync"
   messages_table_arn        = module.chat.table_arn
   chat_table_arn            = module.chat.chat_table_arn
   app_env_arn               = module.secrets.app_env_arn
