@@ -39,5 +39,5 @@ output "chat_table_name" {
 }
 
 output "chat_v2_table_name" {
-  value = module.chat.v2_table_name
+  value = module.chat.chat_table_name
 }

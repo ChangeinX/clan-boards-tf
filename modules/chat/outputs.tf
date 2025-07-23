@@ -5,10 +5,10 @@ output "table_arn" {
   value = aws_dynamodb_table.messages.arn
 }
 
-output "v2_table_name" {
+output "chat_table_name" {
   value = aws_dynamodb_table.chat.name
 }
 
-output "v2_table_arn" {
+output "chat_table_arn" {
   value = aws_dynamodb_table.chat.arn
 }
