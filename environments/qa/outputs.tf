@@ -37,3 +37,7 @@ output "frontend_distribution_id" {
 output "chat_table_name" {
   value = module.chat.table_name
 }
+
+output "chat_v2_table_name" {
+  value = module.chat.v2_table_name
+}
