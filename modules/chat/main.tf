@@ -18,7 +18,7 @@ resource "aws_dynamodb_table" "messages" {
 }
 
 resource "aws_dynamodb_table" "chat" {
-  name         = "${var.app_name}-chat-v2"
+  name         = "${var.app_name}-chat"
   billing_mode = "PAY_PER_REQUEST"
 
   hash_key  = "PK"
@@ -37,11 +37,6 @@ resource "aws_dynamodb_table" "chat" {
   attribute {
     name = "GSI1PK"
     type = "S"
-  }
-
-  attribute {
-    name = "ttl"
-    type = "N"
   }
 
   global_secondary_index {
