@@ -110,6 +110,7 @@ resource "aws_iam_role_policy" "messages_table" {
       Effect = "Allow",
       Action = [
         "dynamodb:PutItem",
+        "dynamodb:BatchWriteItem",
         "dynamodb:Query"
       ],
       Resource = [var.messages_table_arn, var.chat_table_arn]
