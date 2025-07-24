@@ -47,6 +47,8 @@ jobs:
           frontend_domain_names   = ["${{ secrets.FRONTEND_DOMAIN_NAMES }}"]
           frontend_certificate_arn = "${{ secrets.CERTIFICATE_ARN }}"
           messages_image = "${{ secrets.MESSAGES_IMAGE }}"
+          messages_allowed_origins = ["${{ secrets.MESSAGES_ALLOWED_ORIGINS }}"]
+          user_allowed_origins = ["${{ secrets.USER_ALLOWED_ORIGINS }}"]
           EOF
         shell: bash
       - name: Initialize
