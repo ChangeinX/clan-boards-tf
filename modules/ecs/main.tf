@@ -168,6 +168,8 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.coc_api_token_arn,
         var.google_client_id_arn,
         var.google_client_secret_arn,
+        var.messages_allowed_origins_arn,
+        var.user_allowed_origins_arn,
         "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO"
       ]
     }]
@@ -351,6 +353,10 @@ resource "aws_ecs_task_definition" "user" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
+        },
+        {
+          name  = "ALLOWED_ORIGINS_SECRET_NAME"
+          value = var.user_allowed_origins_name
         }
       ]
     }
@@ -432,6 +438,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
+        },
+        {
+          name  = "ALLOWED_ORIGINS_SECRET_NAME"
+          value = var.messages_allowed_origins_name
         }
       ]
     }
