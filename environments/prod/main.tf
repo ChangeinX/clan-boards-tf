@@ -45,6 +45,8 @@ module "secrets" {
   coc_api_token        = var.coc_api_token
   google_client_id     = var.google_client_id
   google_client_secret = var.google_client_secret
+  messages_allowed_origins = var.messages_allowed_origins
+  user_allowed_origins     = var.user_allowed_origins
 }
 
 module "ecs" {
@@ -74,7 +76,11 @@ module "ecs" {
   coc_api_token_arn         = module.secrets.coc_api_token_arn
   google_client_id_arn      = module.secrets.google_client_id_arn
   google_client_secret_arn  = module.secrets.google_client_secret_arn
-  depends_on                = [module.alb]
+  messages_allowed_origins_arn  = module.secrets.messages_allowed_origins_arn
+  user_allowed_origins_arn      = module.secrets.user_allowed_origins_arn
+  messages_allowed_origins_name = module.secrets.messages_allowed_origins_name
+  user_allowed_origins_name     = module.secrets.user_allowed_origins_name
+  depends_on                    = [module.alb]
 }
 
 module "rds" {

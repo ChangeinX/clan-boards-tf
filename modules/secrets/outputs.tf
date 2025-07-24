@@ -41,3 +41,19 @@ output "google_client_id_arn" {
 output "google_client_secret_arn" {
   value = aws_secretsmanager_secret.google_client_secret.arn
 }
+
+output "messages_allowed_origins_arn" {
+  value = aws_secretsmanager_secret.messages_allowed_origins.arn
+}
+
+output "user_allowed_origins_arn" {
+  value = aws_secretsmanager_secret.user_allowed_origins.arn
+}
+
+output "messages_allowed_origins_name" {
+  value = aws_secretsmanager_secret.messages_allowed_origins.name
+}
+
+output "user_allowed_origins_name" {
+  value = aws_secretsmanager_secret.user_allowed_origins.name
+}

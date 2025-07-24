@@ -39,6 +39,16 @@ variable "google_client_secret" {
   sensitive   = true
 }
 
+variable "messages_allowed_origins" {
+  description = "Allowed CORS origins for the messages service"
+  type        = list(string)
+}
+
+variable "user_allowed_origins" {
+  description = "Allowed CORS origins for the user service"
+  type        = list(string)
+}
+
 variable "db_password" {
   description = "Password for the postgres database"
   type        = string
