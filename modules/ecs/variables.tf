@@ -23,3 +23,6 @@ variable "chat_table_secret_arn" { type = string }
 variable "coc_api_token_arn" { type = string }
 variable "google_client_id_arn" { type = string }
 variable "google_client_secret_arn" { type = string }
+
+variable "messages_allowed_origins_arn" { type = string }
+variable "user_allowed_origins_arn" { type = string }

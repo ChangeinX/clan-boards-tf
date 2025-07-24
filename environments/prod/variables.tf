@@ -74,6 +74,16 @@ variable "messages_image" {
   type        = string
 }
 
+variable "messages_allowed_origins" {
+  description = "List of allowed origin URLs for the messages-java service"
+  type        = list(string)
+}
+
+variable "user_allowed_origins" {
+  description = "List of allowed origin URLs for the user_service"
+  type        = list(string)
+}
+
 
 variable "backend_bucket" {
   description = "S3 bucket for Terraform state"
