@@ -279,10 +279,6 @@ resource "aws_ecs_task_definition" "worker" {
       ]
     }
   ])
-
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
 }
 
 # Task definition for the user service
@@ -315,6 +311,10 @@ resource "aws_ecs_task_definition" "user" {
         {
           name  = "PORT"
           value = "8020"
+        },
+        {
+          name  = "CORS_SECRET_NAME"
+          value = var.user_allowed_origins_name
         }
       ]
       logConfiguration = {
@@ -353,18 +353,10 @@ resource "aws_ecs_task_definition" "user" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
-        },
-        {
-          name  = "ALLOWED_ORIGINS_SECRET_NAME"
-          value = var.user_allowed_origins_name
         }
       ]
     }
   ])
-
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
 }
 
 resource "aws_ecs_task_definition" "messages" {
@@ -396,6 +388,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name  = "PORT"
           value = "8010"
+        },
+        {
+          name  = "CORS_SECRET_NAME"
+          value = var.messages_allowed_origins_name
         }
       ]
       logConfiguration = {
@@ -438,18 +434,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
-        },
-        {
-          name  = "ALLOWED_ORIGINS_SECRET_NAME"
-          value = var.messages_allowed_origins_name
         }
       ]
     }
   ])
-
-  lifecycle {
-    ignore_changes = [container_definitions]
-  }
 }
 
 
@@ -473,9 +461,6 @@ resource "aws_ecs_service" "worker" {
 
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
 }
 
 # Service running the user container
@@ -502,10 +487,6 @@ resource "aws_ecs_service" "user" {
 
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
-
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
 }
 
 resource "aws_ecs_service" "messages" {
@@ -528,8 +509,4 @@ resource "aws_ecs_service" "messages" {
 
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
-
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
 }
