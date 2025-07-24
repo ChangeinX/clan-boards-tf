@@ -38,6 +38,7 @@ module "secrets" {
   region                   = var.region
   app_env                  = var.app_env
   db_endpoint              = module.rds.db_endpoint
+  db_username              = var.db_username
   db_password              = var.db_password
   messages_table           = module.chat.table_name
   chat_table               = module.chat.chat_table_name
@@ -66,6 +67,8 @@ module "ecs" {
   chat_table_arn                = module.chat.chat_table_arn
   app_env_arn                   = module.secrets.app_env_arn
   database_url_arn              = module.secrets.database_url_arn
+  database_username_arn         = module.secrets.database_username_arn
+  database_password_arn         = module.secrets.database_password_arn
   secret_key_arn                = module.secrets.secret_key_arn
   aws_region_arn                = module.secrets.aws_region_arn
   messages_table_secret_arn     = module.secrets.messages_table_secret_arn

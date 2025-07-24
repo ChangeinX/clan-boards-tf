@@ -30,6 +30,24 @@ resource "aws_secretsmanager_secret_version" "database_url" {
   secret_string = "postgresql+psycopg://postgres:${var.db_password}@${var.db_endpoint}:5432/postgres"
 }
 
+resource "aws_secretsmanager_secret" "database_username" {
+  name = "${var.app_name}-db-username"
+}
+
+resource "aws_secretsmanager_secret_version" "database_username" {
+  secret_id     = aws_secretsmanager_secret.database_username.id
+  secret_string = var.db_username
+}
+
+resource "aws_secretsmanager_secret" "database_password" {
+  name = "${var.app_name}-db-password"
+}
+
+resource "aws_secretsmanager_secret_version" "database_password" {
+  secret_id     = aws_secretsmanager_secret.database_password.id
+  secret_string = var.db_password
+}
+
 resource "aws_secretsmanager_secret" "coc_api_token" {
   name = "${var.app_name}-coc-token"
 }

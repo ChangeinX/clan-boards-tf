@@ -129,6 +129,11 @@ resource "aws_iam_role" "task_dynamo" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "user_db_policy" {
+  role       = aws_iam_role.task_dynamo.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+}
+
 resource "aws_iam_role_policy" "user_dynamo" {
   name = "${var.app_name}-user-dynamo"
   role = aws_iam_role.task_dynamo.id
@@ -161,6 +166,8 @@ resource "aws_iam_role_policy" "execution_secrets" {
       Resource = [
         var.app_env_arn,
         var.database_url_arn,
+        var.database_username_arn,
+        var.database_password_arn,
         var.secret_key_arn,
         var.aws_region_arn,
         var.messages_table_secret_arn,
@@ -329,6 +336,18 @@ resource "aws_ecs_task_definition" "user" {
         {
           name      = "APP_ENV"
           valueFrom = var.app_env_arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = var.database_url_arn
+        },
+        {
+          name      = "DATABASE_USERNAME"
+          valueFrom = var.database_username_arn
+        },
+        {
+          name      = "DATABASE_PASSWORD"
+          valueFrom = var.database_password_arn
         },
         {
           name      = "SECRET_KEY"

@@ -10,6 +10,14 @@ output "database_url_arn" {
   value = aws_secretsmanager_secret.database_url.arn
 }
 
+output "database_username_arn" {
+  value = aws_secretsmanager_secret.database_username.arn
+}
+
+output "database_password_arn" {
+  value = aws_secretsmanager_secret.database_password.arn
+}
+
 output "coc_api_token_arn" {
   value = aws_secretsmanager_secret.coc_api_token.arn
 }
