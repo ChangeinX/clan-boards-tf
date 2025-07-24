@@ -16,6 +16,8 @@ variable "chat_table_arn" { type = string }
 
 variable "app_env_arn" { type = string }
 variable "database_url_arn" { type = string }
+variable "database_username_arn" { type = string }
+variable "database_password_arn" { type = string }
 variable "secret_key_arn" { type = string }
 variable "aws_region_arn" { type = string }
 variable "messages_table_secret_arn" { type = string }

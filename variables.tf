@@ -45,6 +45,12 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "db_username" {
+  description = "Username for the postgres database"
+  type        = string
+  default     = "postgres"
+}
+
 variable "db_allowed_ip" {
   description = "CIDR allowed to remotely connect to the database"
   type        = string
