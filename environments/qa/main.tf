@@ -33,45 +33,51 @@ module "chat" {
 }
 
 module "secrets" {
-  source               = "../../modules/secrets"
-  app_name             = var.app_name
-  region               = var.region
-  app_env              = var.app_env
-  db_endpoint          = module.rds.db_endpoint
-  db_password          = var.db_password
-  messages_table       = module.chat.table_name
-  chat_table           = module.chat.chat_table_name
-  coc_api_token        = var.coc_api_token
-  google_client_id     = var.google_client_id
-  google_client_secret = var.google_client_secret
+  source                   = "../../modules/secrets"
+  app_name                 = var.app_name
+  region                   = var.region
+  app_env                  = var.app_env
+  db_endpoint              = module.rds.db_endpoint
+  db_password              = var.db_password
+  messages_table           = module.chat.table_name
+  chat_table               = module.chat.chat_table_name
+  coc_api_token            = var.coc_api_token
+  google_client_id         = var.google_client_id
+  google_client_secret     = var.google_client_secret
+  messages_allowed_origins = var.messages_allowed_origins
+  user_allowed_origins     = var.user_allowed_origins
 }
 
 module "ecs" {
-  source                    = "../../modules/ecs"
-  app_name                  = var.app_name
-  vpc_id                    = module.networking.vpc_id
-  subnet_ids                = module.networking.private_subnet_ids
-  alb_sg_id                 = module.alb.alb_sg_id
-  worker_target_group_arn   = module.alb.api_target_group_arn
-  messages_target_group_arn = module.alb.messages_target_group_arn
-  user_target_group_arn     = module.alb.user_target_group_arn
-  listener_arn              = module.alb.https_listener_arn
-  region                    = var.region
-  worker_image              = var.worker_image
-  user_image                = var.user_image
-  messages_image            = var.messages_image
-  messages_table_arn        = module.chat.table_arn
-  chat_table_arn            = module.chat.chat_table_arn
-  app_env_arn               = module.secrets.app_env_arn
-  database_url_arn          = module.secrets.database_url_arn
-  secret_key_arn            = module.secrets.secret_key_arn
-  aws_region_arn            = module.secrets.aws_region_arn
-  messages_table_secret_arn = module.secrets.messages_table_secret_arn
-  chat_table_secret_arn     = module.secrets.chat_table_secret_arn
-  coc_api_token_arn         = module.secrets.coc_api_token_arn
-  google_client_id_arn      = module.secrets.google_client_id_arn
-  google_client_secret_arn  = module.secrets.google_client_secret_arn
-  depends_on                = [module.alb]
+  source                        = "../../modules/ecs"
+  app_name                      = var.app_name
+  vpc_id                        = module.networking.vpc_id
+  subnet_ids                    = module.networking.private_subnet_ids
+  alb_sg_id                     = module.alb.alb_sg_id
+  worker_target_group_arn       = module.alb.api_target_group_arn
+  messages_target_group_arn     = module.alb.messages_target_group_arn
+  user_target_group_arn         = module.alb.user_target_group_arn
+  listener_arn                  = module.alb.https_listener_arn
+  region                        = var.region
+  worker_image                  = var.worker_image
+  user_image                    = var.user_image
+  messages_image                = var.messages_image
+  messages_table_arn            = module.chat.table_arn
+  chat_table_arn                = module.chat.chat_table_arn
+  app_env_arn                   = module.secrets.app_env_arn
+  database_url_arn              = module.secrets.database_url_arn
+  secret_key_arn                = module.secrets.secret_key_arn
+  aws_region_arn                = module.secrets.aws_region_arn
+  messages_table_secret_arn     = module.secrets.messages_table_secret_arn
+  chat_table_secret_arn         = module.secrets.chat_table_secret_arn
+  coc_api_token_arn             = module.secrets.coc_api_token_arn
+  google_client_id_arn          = module.secrets.google_client_id_arn
+  google_client_secret_arn      = module.secrets.google_client_secret_arn
+  messages_allowed_origins_arn  = module.secrets.messages_allowed_origins_arn
+  user_allowed_origins_arn      = module.secrets.user_allowed_origins_arn
+  messages_allowed_origins_name = module.secrets.messages_allowed_origins_name
+  user_allowed_origins_name     = module.secrets.user_allowed_origins_name
+  depends_on                    = [module.alb]
 }
 
 module "rds" {

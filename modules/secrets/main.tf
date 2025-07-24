@@ -83,3 +83,21 @@ resource "aws_secretsmanager_secret_version" "google_client_secret" {
   secret_id     = aws_secretsmanager_secret.google_client_secret.id
   secret_string = var.google_client_secret
 }
+
+resource "aws_secretsmanager_secret" "messages_allowed_origins" {
+  name = "${var.app_name}-messages-allowed-origins"
+}
+
+resource "aws_secretsmanager_secret_version" "messages_allowed_origins" {
+  secret_id     = aws_secretsmanager_secret.messages_allowed_origins.id
+  secret_string = join(",", var.messages_allowed_origins)
+}
+
+resource "aws_secretsmanager_secret" "user_allowed_origins" {
+  name = "${var.app_name}-user-allowed-origins"
+}
+
+resource "aws_secretsmanager_secret_version" "user_allowed_origins" {
+  secret_id     = aws_secretsmanager_secret.user_allowed_origins.id
+  secret_string = join(",", var.user_allowed_origins)
+}
