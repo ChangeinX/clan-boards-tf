@@ -48,8 +48,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Resource = aws_sqs_queue.outbox.arn
       },
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "dynamodb:GetRecords",
           "dynamodb:GetShardIterator",
           "dynamodb:DescribeStream",

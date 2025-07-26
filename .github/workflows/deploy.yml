@@ -49,6 +49,9 @@ jobs:
           messages_image = "${{ secrets.MESSAGES_IMAGE }}"
           messages_allowed_origins = ["${{ secrets.MESSAGES_ALLOWED_ORIGINS }}"]
           user_allowed_origins = ["${{ secrets.USER_ALLOWED_ORIGINS }}"]
+          notifications_image = "${{ secrets.NOTIFICATIONS_IMAGE }}"
+          notifications_allowed_origins = ["${{ secrets.NOTIFICATIONS_ALLOWED_ORIGINS }}"]
+          vapid_secret_name = "${{ secrets.VAPID_SECRET_NAME }}"
           EOF
         shell: bash
       - name: Initialize
