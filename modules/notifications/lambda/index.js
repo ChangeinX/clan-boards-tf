@@ -7,11 +7,12 @@ exports.handler = async (event) => {
   for (const record of event.Records) {
     if (record.eventName !== 'INSERT') continue;
     const item = unmarshall(record.dynamodb.NewImage);
-    const body = JSON.stringify({ userId: item.userId, payload: item.payload });
+    const body = JSON.stringify({ senderId: item.senderId, payload: item.payload });
     const command = new SendMessageCommand({
       QueueUrl: process.env.QUEUE_URL,
       MessageBody: body,
     });
-    await sqs.send(command);  }
+    await sqs.send(command);
+  }
   return {};
 };
