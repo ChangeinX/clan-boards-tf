@@ -214,3 +214,26 @@ resource "aws_lb_listener_rule" "api" {
     }
   }
 }
+
+resource "aws_lb_listener_rule" "notifications" {
+  count        = var.api_host == null ? 0 : 1
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 115
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.notifications.arn
+  }
+
+  condition {
+    host_header {
+      values = [var.api_host]
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/notifications*"]
+    }
+  }
+}
