@@ -93,7 +93,12 @@ resource "aws_lb_target_group" "user" {
   }
 
   health_check {
-    path = "/api/v1/health"
+    path                = "/api/v1/health"
+    interval            = 30
+    timeout             = 20
+    healthy_threshold   = 5
+    unhealthy_threshold = 10
+    matcher             = "200-399"
   }
 }
 
