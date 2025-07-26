@@ -13,6 +13,13 @@ You have tofu installed, but no access to deployed resources.
   tofu validate
   ```
 
+- Check for updates to `main` before starting work:
+  ```bash
+  git fetch origin
+  git log HEAD..origin/main --oneline
+  ```
+  Merge or rebase if new commits exist.
+
 - Do not modify `.terraform.lock.hcl`.
 - Do not commit state files or the `.terraform` directory.
 - Update `README.md` when variables, outputs or modules change.

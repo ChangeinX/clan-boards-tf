@@ -29,3 +29,7 @@ output "user_target_group_arn" {
   value = aws_lb_target_group.user.arn
 }
 
+output "notifications_target_group_arn" {
+  value = aws_lb_target_group.notifications.arn
+}
+
