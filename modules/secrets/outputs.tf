@@ -26,10 +26,6 @@ output "aws_region_arn" {
   value = aws_secretsmanager_secret.aws_region.arn
 }
 
-output "messages_table_secret_arn" {
-  value = aws_secretsmanager_secret.messages_table.arn
-}
-
 output "chat_table_secret_arn" {
   value = aws_secretsmanager_secret.chat_table.arn
 }

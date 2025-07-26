@@ -90,6 +90,16 @@ variable "messages_image" {
   type        = string
 }
 
+variable "notifications_image" {
+  description = "Docker image for the notifications service"
+  type        = string
+}
+
+variable "vapid_secret_name" {
+  description = "Name of the VAPID keys secret"
+  type        = string
+}
+
 
 variable "backend_bucket" {
   description = "S3 bucket for Terraform state"

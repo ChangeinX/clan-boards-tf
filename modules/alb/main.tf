@@ -93,6 +93,27 @@ resource "aws_lb_target_group" "user" {
   }
 
   health_check {
+    path                = "/api/v1/health"
+    interval            = 30
+    timeout             = 20
+    healthy_threshold   = 5
+    unhealthy_threshold = 10
+    matcher             = "200-399"
+  }
+}
+
+resource "aws_lb_target_group" "notifications" {
+  name_prefix = "${substr(var.app_name, 0, 2)}ntf-"
+  port        = 8030
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  health_check {
     path = "/api/v1/health"
   }
 }
