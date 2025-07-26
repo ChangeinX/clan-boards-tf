@@ -31,4 +31,5 @@ variable "messages_allowed_origins_name" { type = string }
 variable "user_allowed_origins_name" { type = string }
 variable "notifications_queue_url" { type = string }
 variable "notifications_queue_arn" { type = string }
+variable "notifications_dlq_url" { type = string }
 variable "vapid_secret_arn" { type = string }
