@@ -530,8 +530,12 @@ resource "aws_ecs_task_definition" "notifications" {
           value = "8030"
         },
         {
-          name  = "QUEUE_URL"
+          name  = "OUTBOX_QUEUE_URL"
           value = var.notifications_queue_url
+        },
+        {
+          name  = "OUTBOX_DLQ_URL"
+          value = var.notifications_dlq_url
         }
       ]
       logConfiguration = {

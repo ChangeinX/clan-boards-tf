@@ -88,6 +88,7 @@ module "ecs" {
   notifications_image            = var.notifications_image
   notifications_queue_url        = module.notifications.queue_url
   notifications_queue_arn        = module.notifications.queue_arn
+  notifications_dlq_url          = module.notifications.dlq_url
   vapid_secret_arn               = module.notifications.vapid_secret_arn
   depends_on                     = [module.alb]
 }

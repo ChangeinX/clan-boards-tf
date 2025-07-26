@@ -11,7 +11,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `secrets` stores application configuration in Secrets Manager for the ECS tasks.
 - `ecs` sets up the ECS cluster, task definitions and services. The user service is registered in Cloud Map so other tasks can reach it via `user.<app_name>.local` and is exposed through the ALB at `/api/v1/friends`. It now requires the chat table ARN and related secret ARNs so tasks can read and write chat messages.
   The user task also receives database credentials from Secrets Manager.
-- `notifications` connects the chat table stream to an SQS outbox with a Lambda function and exposes VAPID keys for push notifications.
+- `notifications` connects the chat table stream to an SQS outbox with a Lambda function, exposes VAPID keys for push notifications and now outputs the outbox and DLQ queue URLs.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
 - `chat` provisions a DynamoDB table used for the chat service with streams enabled. The table name, ARN and stream ARN are exported for other modules.
