@@ -568,7 +568,7 @@ resource "aws_ecs_task_definition" "notifications" {
           valueFrom = var.aws_region_arn
         },
         {
-          name      = "VAPID_SECRET"
+          name      = "VAPID_KEYS"
           valueFrom = var.vapid_secret_arn
         }
       ]
