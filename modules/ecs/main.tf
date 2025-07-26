@@ -65,6 +65,10 @@ resource "aws_cloudwatch_log_group" "messages" {
   name = "/ecs/${var.app_name}-messages"
 }
 
+resource "aws_cloudwatch_log_group" "notifications" {
+  name = "/ecs/${var.app_name}-notifications"
+}
+
 # IAM roles
 resource "aws_iam_role" "task_execution" {
   name = "${var.app_name}-task-exec"
@@ -100,8 +104,8 @@ resource "aws_iam_role_policy_attachment" "task_db_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
-resource "aws_iam_role_policy" "messages_table" {
-  name = "${var.app_name}-messages-table"
+resource "aws_iam_role_policy" "chat_table" {
+  name = "${var.app_name}-chat-table"
   role = aws_iam_role.task_with_db.id
 
   policy = jsonencode({
@@ -113,7 +117,7 @@ resource "aws_iam_role_policy" "messages_table" {
         "dynamodb:BatchWriteItem",
         "dynamodb:Query"
       ],
-      Resource = [var.messages_table_arn, var.chat_table_arn]
+      Resource = [var.chat_table_arn]
     }]
   })
 }
@@ -147,8 +151,42 @@ resource "aws_iam_role_policy" "user_dynamo" {
         "dynamodb:PutItem",
         "dynamodb:Query"
       ],
-      Resource = [var.messages_table_arn, var.chat_table_arn]
+      Resource = [var.chat_table_arn]
     }]
+  })
+}
+
+# IAM role for the notifications service
+resource "aws_iam_role" "task_notifications" {
+  name = "${var.app_name}-task-notifications"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action    = "sts:AssumeRole",
+      Effect    = "Allow",
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "task_notifications" {
+  name = "${var.app_name}-notifications"
+  role = aws_iam_role.task_notifications.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = ["secretsmanager:GetSecretValue"],
+        Resource = var.vapid_secret_arn
+      },
+      {
+        Effect   = "Allow",
+        Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
+        Resource = var.notifications_queue_arn
+      }
+    ]
   })
 }
 
@@ -171,8 +209,8 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.database_password_arn,
         var.secret_key_arn,
         var.aws_region_arn,
-        var.messages_table_secret_arn,
         var.chat_table_secret_arn,
+        var.vapid_secret_arn,
         var.coc_api_token_arn,
         var.google_client_id_arn,
         var.google_client_secret_arn,
@@ -359,10 +397,6 @@ resource "aws_ecs_task_definition" "user" {
           valueFrom = var.aws_region_arn
         },
         {
-          name      = "MESSAGES_TABLE"
-          valueFrom = var.messages_table_secret_arn
-        },
-        {
           name      = "CHAT_TABLE"
           valueFrom = var.chat_table_secret_arn
         },
@@ -440,10 +474,6 @@ resource "aws_ecs_task_definition" "messages" {
           valueFrom = var.aws_region_arn
         },
         {
-          name      = "MESSAGES_TABLE"
-          valueFrom = var.messages_table_secret_arn
-        },
-        {
           name      = "CHAT_TABLE"
           valueFrom = var.chat_table_secret_arn
         },
@@ -454,6 +484,71 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
+        }
+      ]
+    }
+  ])
+}
+
+resource "aws_ecs_task_definition" "notifications" {
+  family                   = "${var.app_name}-notifications"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_notifications.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "notifications"
+      image     = var.notifications_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8030
+          hostPort      = 8030
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8030"
+        },
+        {
+          name  = "OUTBOX_QUEUE_URL"
+          value = var.notifications_queue_url
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.notifications.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "notifications"
+        }
+      }
+      secrets = [
+        {
+          name      = "DATABASE_URL"
+          valueFrom = var.database_url_arn
+        },
+        {
+          name      = "DATABASE_USERNAME"
+          valueFrom = var.database_username_arn
+        },
+        {
+          name      = "DATABASE_PASSWORD"
+          valueFrom = var.database_password_arn
+        },
+        {
+          name      = "VAPID_KEYS"
+          valueFrom = var.vapid_secret_arn
         }
       ]
     }
@@ -524,6 +619,28 @@ resource "aws_ecs_service" "messages" {
     target_group_arn = var.messages_target_group_arn
     container_name   = "messages"
     container_port   = 8010
+  }
+  depends_on = [var.listener_arn]
+
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+}
+
+resource "aws_ecs_service" "notifications" {
+  name            = "${var.app_name}-notifications-svc"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.notifications.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  load_balancer {
+    target_group_arn = var.notifications_target_group_arn
+    container_name   = "notifications"
+    container_port   = 8030
   }
   depends_on = [var.listener_arn]
 

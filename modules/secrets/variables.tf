@@ -4,7 +4,6 @@ variable "app_env" { type = string }
 variable "db_endpoint" { type = string }
 variable "db_username" { type = string }
 variable "db_password" { type = string }
-variable "messages_table" { type = string }
 variable "chat_table" { type = string }
 variable "coc_api_token" { type = string }
 variable "google_client_id" { type = string }

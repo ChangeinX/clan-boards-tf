@@ -13,10 +13,10 @@ This configuration provisions an AWS environment for a containerized web applica
   The user task also receives database credentials from Secrets Manager.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
-- `chat` provisions two DynamoDB tables used for the chat service. The existing
-  `messages` table stores one item per message. A new single-table design named
-  `${var.app_name}-chat-v2` is deployed alongside it to prepare for migration.
-  The module outputs the names and ARNs for both tables.
+- `chat` provisions a DynamoDB table used for the chat service with Streams
+  enabled so changes can trigger other components.
+- `notifications` creates the outbox queue, Lambda and alarms used for push
+  notifications.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker also loads `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the user service at `user.<app_name>.local` or through the ALB path `/api/v1/friends`.
 ## Usage
@@ -26,6 +26,7 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 worker_image        = "<worker image>"
 user_image          = "<user service image>"
 messages_image      = "<messages service image>"
+notifications_image = "<notifications service image>"
 db_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"
 db_username  = "postgres"
@@ -37,6 +38,7 @@ google_client_id = "<google oauth client id>"
 google_client_secret = "<google oauth client secret>"
 messages_allowed_origins = ["https://app.example.com"]
 user_allowed_origins     = ["https://app.example.com"]
+vapid_secret_name        = "dev/vapid-keys"
 backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
 frontend_bucket_name = "<s3 bucket for frontend>"
@@ -62,7 +64,7 @@ tofu apply
 ```
 
 The outputs will display the ALB DNS name, database endpoint, the NAT gateway's
-public IP and both chat table names.
+public IP and the chat table name.
 
 Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
 

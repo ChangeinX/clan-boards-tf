@@ -25,6 +25,10 @@ output "messages_target_group_arn" {
   value = aws_lb_target_group.messages.arn
 }
 
+output "notifications_target_group_arn" {
+  value = aws_lb_target_group.notifications.arn
+}
+
 output "user_target_group_arn" {
   value = aws_lb_target_group.user.arn
 }

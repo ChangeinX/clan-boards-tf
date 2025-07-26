@@ -66,15 +66,6 @@ resource "aws_secretsmanager_secret_version" "aws_region" {
   secret_string = var.region
 }
 
-resource "aws_secretsmanager_secret" "messages_table" {
-  name = "${var.app_name}-messages-table"
-}
-
-resource "aws_secretsmanager_secret_version" "messages_table" {
-  secret_id     = aws_secretsmanager_secret.messages_table.id
-  secret_string = var.messages_table
-}
-
 resource "aws_secretsmanager_secret" "chat_table" {
   name = "${var.app_name}-chat-v2-table"
 }
