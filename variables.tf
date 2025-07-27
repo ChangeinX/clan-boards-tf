@@ -49,6 +49,11 @@ variable "user_allowed_origins" {
   type        = list(string)
 }
 
+variable "notifications_allowed_origins" {
+  description = "Allowed CORS origins for the notifications service"
+  type        = list(string)
+}
+
 variable "db_password" {
   description = "Password for the postgres database"
   type        = string
