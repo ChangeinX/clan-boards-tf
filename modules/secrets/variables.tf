@@ -10,3 +10,4 @@ variable "google_client_id" { type = string }
 variable "google_client_secret" { type = string }
 variable "messages_allowed_origins" { type = list(string) }
 variable "user_allowed_origins" { type = list(string) }
+variable "notifications_allowed_origins" { type = list(string) }

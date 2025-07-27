@@ -110,3 +110,12 @@ resource "aws_secretsmanager_secret_version" "user_allowed_origins" {
   secret_id     = aws_secretsmanager_secret.user_allowed_origins.id
   secret_string = join(",", var.user_allowed_origins)
 }
+
+resource "aws_secretsmanager_secret" "notifications_allowed_origins" {
+  name = "${var.app_name}-notifications-allowed-origins"
+}
+
+resource "aws_secretsmanager_secret_version" "notifications_allowed_origins" {
+  secret_id     = aws_secretsmanager_secret.notifications_allowed_origins.id
+  secret_string = join(",", var.notifications_allowed_origins)
+}

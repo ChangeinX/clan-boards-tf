@@ -35,6 +35,7 @@ google_client_id = "<google oauth client id>"
 google_client_secret = "<google oauth client secret>"
 messages_allowed_origins = ["https://app.example.com"]
 user_allowed_origins     = ["https://app.example.com"]
+notifications_allowed_origins = ["https://app.example.com"]
 backend_bucket = "<s3 bucket for state>"
 backend_dynamodb_table = "<dynamodb table for locking>"
 frontend_bucket_name = "<s3 bucket for frontend>"

@@ -53,3 +53,11 @@ output "messages_allowed_origins_name" {
 output "user_allowed_origins_name" {
   value = aws_secretsmanager_secret.user_allowed_origins.name
 }
+
+output "notifications_allowed_origins_arn" {
+  value = aws_secretsmanager_secret.notifications_allowed_origins.arn
+}
+
+output "notifications_allowed_origins_name" {
+  value = aws_secretsmanager_secret.notifications_allowed_origins.name
+}

@@ -224,6 +224,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.google_client_secret_arn,
         var.messages_allowed_origins_arn,
         var.user_allowed_origins_arn,
+        var.notifications_allowed_origins_arn,
         var.vapid_secret_arn,
         "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO"
       ]
@@ -528,6 +529,10 @@ resource "aws_ecs_task_definition" "notifications" {
         {
           name  = "PORT"
           value = "8030"
+        },
+        {
+          name  = "CORS_SECRET_NAME"
+          value = var.notifications_allowed_origins_name
         },
         {
           name  = "OUTBOX_QUEUE_URL"
