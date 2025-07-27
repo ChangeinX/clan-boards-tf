@@ -61,7 +61,12 @@ resource "aws_lb_target_group" "api" {
   }
 
   health_check {
-    path = "/api/v1/health"
+    path                = "/api/v1/health"
+    interval            = 30
+    timeout             = 20
+    healthy_threshold   = 5
+    unhealthy_threshold = 10
+    matcher             = "200-399"
   }
 }
 
@@ -77,7 +82,12 @@ resource "aws_lb_target_group" "messages" {
   }
 
   health_check {
-    path = "/api/v1/health"
+    path                = "/api/v1/health"
+    interval            = 30
+    timeout             = 20
+    healthy_threshold   = 5
+    unhealthy_threshold = 10
+    matcher             = "200-399"
   }
 }
 
@@ -114,7 +124,12 @@ resource "aws_lb_target_group" "notifications" {
   }
 
   health_check {
-    path = "/api/v1/health"
+    path                = "/api/v1/health"
+    interval            = 180
+    timeout             = 120
+    healthy_threshold   = 5
+    unhealthy_threshold = 10
+    matcher             = "200-399"
   }
 }
 
