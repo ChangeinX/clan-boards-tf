@@ -202,7 +202,7 @@ resource "aws_lb_listener_rule" "user" {
 
   condition {
     path_pattern {
-      values = ["/api/v1/friends*"]
+      values = ["/api/v1/friends*", "/api/v1/auth*", "/api/v1/logout*"]
     }
   }
 }
@@ -210,7 +210,7 @@ resource "aws_lb_listener_rule" "user" {
 resource "aws_lb_listener_rule" "api" {
   count        = var.api_host == null ? 0 : 1
   listener_arn = aws_lb_listener.https.arn
-  priority     = 110
+  priority     = 500
 
   action {
     type             = "forward"
@@ -233,7 +233,7 @@ resource "aws_lb_listener_rule" "api" {
 resource "aws_lb_listener_rule" "notifications" {
   count        = var.api_host == null ? 0 : 1
   listener_arn = aws_lb_listener.https.arn
-  priority     = 115
+  priority     = 110
 
   action {
     type             = "forward"

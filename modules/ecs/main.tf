@@ -226,6 +226,10 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.user_allowed_origins_arn,
         var.notifications_allowed_origins_arn,
         var.vapid_secret_arn,
+        var.jwt_signing_key_arn,
+        var.session_max_age_arn,
+        var.cookie_domain_arn,
+        var.cookie_secure_arn,
         "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO"
       ]
     }]
