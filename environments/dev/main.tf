@@ -18,6 +18,11 @@ module "networking" {
   app_name = var.app_name
 }
 
+module "waf" {
+  source   = "../../modules/waf"
+  app_name = var.app_name
+}
+
 module "alb" {
   source            = "../../modules/alb"
   app_name          = var.app_name
@@ -25,6 +30,7 @@ module "alb" {
   public_subnet_ids = module.networking.public_subnet_ids
   certificate_arn   = var.certificate_arn
   api_host          = var.api_host
+  waf_web_acl_arn   = module.waf.web_acl_arn
 }
 
 module "chat" {

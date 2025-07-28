@@ -7,6 +7,7 @@ This configuration provisions an AWS environment for a containerized web applica
   endpoints for Secrets Manager, ECR, CloudWatch Logs and S3 so tasks can pull
   container images without internet access
 - `alb` provisions the Application Load Balancer and related security group
+- `waf` deploys an AWS WAFv2 Web ACL attached to the ALB
 - `rds` creates the Postgres database in the private subnets
 - `secrets` stores application configuration in Secrets Manager for the ECS tasks.
 - `ecs` sets up the ECS cluster, task definitions and services. The user service is registered in Cloud Map so other tasks can reach it via `user.<app_name>.local` and is exposed through the ALB at `/api/v1/friends`. It now requires the chat table ARN and related secret ARNs so tasks can read and write chat messages.
