@@ -325,6 +325,22 @@ resource "aws_ecs_task_definition" "worker" {
           valueFrom = var.google_client_secret_arn
         },
         {
+          name      = "JWT_SIGNING_KEY"
+          valueFrom = var.jwt_signing_key_arn
+        },
+        {
+          name      = "SESSION_MAX_AGE"
+          valueFrom = var.session_max_age_arn
+        },
+        {
+          name      = "COOKIE_DOMAIN"
+          valueFrom = var.cookie_domain_arn
+        },
+        {
+          name      = "COOKIE_SECURE"
+          valueFrom = var.cookie_secure_arn
+        },
+        {
           name      = "COC_EMAIL"
           valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_EMAIL::"
         },
@@ -417,6 +433,22 @@ resource "aws_ecs_task_definition" "user" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
+        },
+        {
+          name      = "JWT_SIGNING_KEY"
+          valueFrom = var.jwt_signing_key_arn
+        },
+        {
+          name      = "SESSION_MAX_AGE"
+          valueFrom = var.session_max_age_arn
+        },
+        {
+          name      = "COOKIE_DOMAIN"
+          valueFrom = var.cookie_domain_arn
+        },
+        {
+          name      = "COOKIE_SECURE"
+          valueFrom = var.cookie_secure_arn
         }
       ]
     }
@@ -494,6 +526,22 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "GOOGLE_CLIENT_SECRET"
           valueFrom = var.google_client_secret_arn
+        },
+        {
+          name      = "JWT_SIGNING_KEY"
+          valueFrom = var.jwt_signing_key_arn
+        },
+        {
+          name      = "SESSION_MAX_AGE"
+          valueFrom = var.session_max_age_arn
+        },
+        {
+          name      = "COOKIE_DOMAIN"
+          valueFrom = var.cookie_domain_arn
+        },
+        {
+          name      = "COOKIE_SECURE"
+          valueFrom = var.cookie_secure_arn
         }
       ]
     }
@@ -579,6 +627,22 @@ resource "aws_ecs_task_definition" "notifications" {
         {
           name      = "VAPID_KEYS"
           valueFrom = var.vapid_secret_arn
+        },
+        {
+          name      = "JWT_SIGNING_KEY"
+          valueFrom = var.jwt_signing_key_arn
+        },
+        {
+          name      = "SESSION_MAX_AGE"
+          valueFrom = var.session_max_age_arn
+        },
+        {
+          name      = "COOKIE_DOMAIN"
+          valueFrom = var.cookie_domain_arn
+        },
+        {
+          name      = "COOKIE_SECURE"
+          valueFrom = var.cookie_secure_arn
         }
       ]
     }

@@ -47,6 +47,9 @@ module "secrets" {
   messages_allowed_origins      = var.messages_allowed_origins
   user_allowed_origins          = var.user_allowed_origins
   notifications_allowed_origins = var.notifications_allowed_origins
+  session_max_age               = var.session_max_age
+  cookie_domain                 = var.cookie_domain
+  cookie_secure                 = var.cookie_secure
 }
 
 module "notifications" {
@@ -81,6 +84,10 @@ module "ecs" {
   coc_api_token_arn                  = module.secrets.coc_api_token_arn
   google_client_id_arn               = module.secrets.google_client_id_arn
   google_client_secret_arn           = module.secrets.google_client_secret_arn
+  jwt_signing_key_arn                = module.secrets.jwt_signing_key_arn
+  session_max_age_arn                = module.secrets.session_max_age_arn
+  cookie_domain_arn                  = module.secrets.cookie_domain_arn
+  cookie_secure_arn                  = module.secrets.cookie_secure_arn
   messages_allowed_origins_arn       = module.secrets.messages_allowed_origins_arn
   user_allowed_origins_arn           = module.secrets.user_allowed_origins_arn
   notifications_allowed_origins_arn  = module.secrets.notifications_allowed_origins_arn
