@@ -7,6 +7,5 @@ variable "api_host" {
   default = null
 }
 variable "waf_web_acl_arn" {
-  type    = string
-  default = null
+  type = string
 }
