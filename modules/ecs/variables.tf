@@ -35,3 +35,8 @@ variable "notifications_queue_url" { type = string }
 variable "notifications_queue_arn" { type = string }
 variable "notifications_dlq_url" { type = string }
 variable "vapid_secret_arn" { type = string }
+
+variable "jwt_signing_key_arn" { type = string }
+variable "session_max_age_arn" { type = string }
+variable "cookie_domain_arn" { type = string }
+variable "cookie_secure_arn" { type = string }

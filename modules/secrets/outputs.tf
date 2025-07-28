@@ -61,3 +61,19 @@ output "notifications_allowed_origins_arn" {
 output "notifications_allowed_origins_name" {
   value = aws_secretsmanager_secret.notifications_allowed_origins.name
 }
+
+output "jwt_signing_key_arn" {
+  value = aws_secretsmanager_secret.jwt_signing_key.arn
+}
+
+output "session_max_age_arn" {
+  value = aws_secretsmanager_secret.session_max_age.arn
+}
+
+output "cookie_domain_arn" {
+  value = aws_secretsmanager_secret.cookie_domain.arn
+}
+
+output "cookie_secure_arn" {
+  value = aws_secretsmanager_secret.cookie_secure.arn
+}

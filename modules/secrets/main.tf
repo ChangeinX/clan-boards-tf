@@ -119,3 +119,44 @@ resource "aws_secretsmanager_secret_version" "notifications_allowed_origins" {
   secret_id     = aws_secretsmanager_secret.notifications_allowed_origins.id
   secret_string = join(",", var.notifications_allowed_origins)
 }
+
+resource "random_password" "jwt_signing_key" {
+  length  = 64
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "jwt_signing_key" {
+  name = "${var.app_name}-jwt-signing-key"
+}
+
+resource "aws_secretsmanager_secret_version" "jwt_signing_key" {
+  secret_id     = aws_secretsmanager_secret.jwt_signing_key.id
+  secret_string = random_password.jwt_signing_key.result
+}
+
+resource "aws_secretsmanager_secret" "session_max_age" {
+  name = "${var.app_name}-session-max-age"
+}
+
+resource "aws_secretsmanager_secret_version" "session_max_age" {
+  secret_id     = aws_secretsmanager_secret.session_max_age.id
+  secret_string = var.session_max_age
+}
+
+resource "aws_secretsmanager_secret" "cookie_domain" {
+  name = "${var.app_name}-cookie-domain"
+}
+
+resource "aws_secretsmanager_secret_version" "cookie_domain" {
+  secret_id     = aws_secretsmanager_secret.cookie_domain.id
+  secret_string = var.cookie_domain
+}
+
+resource "aws_secretsmanager_secret" "cookie_secure" {
+  name = "${var.app_name}-cookie-secure"
+}
+
+resource "aws_secretsmanager_secret_version" "cookie_secure" {
+  secret_id     = aws_secretsmanager_secret.cookie_secure.id
+  secret_string = tostring(var.cookie_secure)
+}

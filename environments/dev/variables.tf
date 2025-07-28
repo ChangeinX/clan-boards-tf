@@ -54,6 +54,22 @@ variable "notifications_allowed_origins" {
   type        = list(string)
 }
 
+variable "session_max_age" {
+  description = "Max age in seconds for JWT sessions"
+  type        = string
+}
+
+variable "cookie_domain" {
+  description = "Domain for the session cookie"
+  type        = string
+}
+
+variable "cookie_secure" {
+  description = "Whether the session cookie is secure"
+  type        = bool
+  default     = true
+}
+
 variable "db_password" {
   description = "Password for the postgres database"
   type        = string

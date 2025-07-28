@@ -202,7 +202,7 @@ resource "aws_lb_listener_rule" "user" {
 
   condition {
     path_pattern {
-      values = ["/api/v1/friends*"]
+      values = ["/api/v1/friends*", "/api/v1/auth*", "/api/v1/logout*"]
     }
   }
 }
@@ -257,4 +257,3 @@ resource "aws_wafv2_web_acl_association" "this" {
   resource_arn = aws_lb.this.arn
   web_acl_arn  = var.waf_web_acl_arn
 }
-

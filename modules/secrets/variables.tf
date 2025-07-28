@@ -11,3 +11,16 @@ variable "google_client_secret" { type = string }
 variable "messages_allowed_origins" { type = list(string) }
 variable "user_allowed_origins" { type = list(string) }
 variable "notifications_allowed_origins" { type = list(string) }
+
+variable "session_max_age" {
+  type = string
+}
+
+variable "cookie_domain" {
+  type = string
+}
+
+variable "cookie_secure" {
+  type    = bool
+  default = true
+}
