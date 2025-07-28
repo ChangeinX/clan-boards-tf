@@ -52,6 +52,8 @@ jobs:
           notifications_image = "${{ secrets.NOTIFICATIONS_IMAGE }}"
           notifications_allowed_origins = ["${{ secrets.NOTIFICATIONS_ALLOWED_ORIGINS }}"]
           vapid_secret_name = "${{ secrets.VAPID_SECRET_NAME }}"
+          cookie_domain = "${{ secrets.COOKIE_DOMAIN }}"
+          session_max_age = "${{ secrets.SESSION_MAX_AGE }}"
           EOF
         shell: bash
       - name: Initialize
