@@ -15,6 +15,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `notifications` connects the chat table stream to an SQS outbox with a Lambda function, exposes VAPID keys for push notifications and now outputs the outbox and DLQ queue URLs.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
+- `welcome` creates a private S3 bucket with a CloudFront distribution using origin access control.
 - `chat` provisions a DynamoDB table used for the chat service with streams enabled. The table name, ARN and stream ARN are exported for other modules.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker also loads `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the user service at `user.<app_name>.local` or through the ALB path `/api/v1/friends`.
@@ -45,6 +46,9 @@ backend_dynamodb_table = "<dynamodb table for locking>"
 frontend_bucket_name = "<s3 bucket for frontend>"
 frontend_domain_names = ["app.example.com"]
 frontend_certificate_arn = "<acm cert arn for frontend>"
+welcome_bucket_name = "<s3 bucket for welcome page>"
+welcome_domain_names = ["welcome.example.com"]
+welcome_certificate_arn = "<acm cert arn for welcome>"
 ```
 
 2. Create the state bucket and DynamoDB table using the helper script. The
@@ -67,7 +71,7 @@ tofu apply
 The outputs will display the ALB DNS name, database endpoint, the NAT gateway's
 public IP and both chat table names.
 
-Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` after uploading new files to the bucket to refresh cached content.
+Use `scripts/invalidate-cloudfront.sh` with the output `frontend_distribution_id` or `welcome_distribution_id` after uploading new files to the bucket to refresh cached content.
 
 ## Environments
 Separate Terraform roots are provided under `environments/dev`, `environments/qa` and `environments/prod`. Each folder uses its own state prefix so the stages are isolated.

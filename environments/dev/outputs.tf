@@ -41,3 +41,15 @@ output "chat_table_name" {
 output "chat_table_stream_arn" {
   value = module.chat.chat_table_stream_arn
 }
+
+output "welcome_bucket" {
+  value = module.welcome.bucket_name
+}
+
+output "welcome_distribution" {
+  value = module.welcome.distribution_domain_name
+}
+
+output "welcome_distribution_id" {
+  value = module.welcome.distribution_id
+}

@@ -133,3 +133,10 @@ module "frontend" {
   domain_names    = var.frontend_domain_names
   certificate_arn = var.frontend_certificate_arn
 }
+
+module "welcome" {
+  source          = "../../modules/welcome"
+  bucket_name     = var.welcome_bucket_name
+  domain_names    = var.welcome_domain_names
+  certificate_arn = var.welcome_certificate_arn
+}
