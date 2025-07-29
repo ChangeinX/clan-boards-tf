@@ -139,3 +139,20 @@ variable "frontend_certificate_arn" {
   default     = null
 }
 
+
+variable "welcome_bucket_name" {
+  description = "S3 bucket to host the welcome page"
+  type        = string
+}
+
+variable "welcome_domain_names" {
+  description = "Domain names for the welcome page CloudFront distribution"
+  type        = list(string)
+  default     = []
+}
+
+variable "welcome_certificate_arn" {
+  description = "ACM certificate ARN for the welcome page distribution"
+  type        = string
+  default     = null
+}
