@@ -13,10 +13,10 @@ resource "aws_s3_bucket_public_access_block" "this" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_cloudfront_origin_access_control" "this" {
-  name                            = "${var.bucket_name}-oac"
+  name                              = "${var.bucket_name}-oac"
   origin_access_control_origin_type = "s3"
-  signing_behavior                = "always"
-  signing_protocol                = "sigv4"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 resource "aws_cloudfront_distribution" "this" {
@@ -73,7 +73,7 @@ resource "aws_cloudfront_distribution" "this" {
 
 data "aws_iam_policy_document" "allow_cf" {
   statement {
-    actions   = ["s3:GetObject"]
+    actions = ["s3:GetObject"]
     principals {
       type        = "Service"
       identifiers = ["cloudfront.amazonaws.com"]
