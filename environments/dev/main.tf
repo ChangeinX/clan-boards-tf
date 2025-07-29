@@ -39,23 +39,21 @@ module "chat" {
 }
 
 module "secrets" {
-  source                        = "../../modules/secrets"
-  app_name                      = var.app_name
-  region                        = var.region
-  app_env                       = var.app_env
-  db_endpoint                   = module.rds.db_endpoint
-  db_username                   = var.db_username
-  db_password                   = var.db_password
-  chat_table                    = module.chat.chat_table_name
-  coc_api_token                 = var.coc_api_token
-  google_client_id              = var.google_client_id
-  google_client_secret          = var.google_client_secret
-  messages_allowed_origins      = var.messages_allowed_origins
-  user_allowed_origins          = var.user_allowed_origins
-  notifications_allowed_origins = var.notifications_allowed_origins
-  session_max_age               = var.session_max_age
-  cookie_domain                 = var.cookie_domain
-  cookie_secure                 = var.cookie_secure
+  source               = "../../modules/secrets"
+  app_name             = var.app_name
+  region               = var.region
+  app_env              = var.app_env
+  db_endpoint          = module.rds.db_endpoint
+  db_username          = var.db_username
+  db_password          = var.db_password
+  chat_table           = module.chat.chat_table_name
+  coc_api_token        = var.coc_api_token
+  google_client_id     = var.google_client_id
+  google_client_secret = var.google_client_secret
+  cors_allowed_origins = var.cors_allowed_origins
+  session_max_age      = var.session_max_age
+  cookie_domain        = var.cookie_domain
+  cookie_secure        = var.cookie_secure
 }
 
 module "notifications" {
