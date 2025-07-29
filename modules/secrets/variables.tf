@@ -8,9 +8,7 @@ variable "chat_table" { type = string }
 variable "coc_api_token" { type = string }
 variable "google_client_id" { type = string }
 variable "google_client_secret" { type = string }
-variable "messages_allowed_origins" { type = list(string) }
-variable "user_allowed_origins" { type = list(string) }
-variable "notifications_allowed_origins" { type = list(string) }
+variable "cors_allowed_origins" { type = list(string) }
 
 variable "session_max_age" {
   type = string

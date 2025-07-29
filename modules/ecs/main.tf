@@ -345,6 +345,10 @@ resource "aws_ecs_task_definition" "worker" {
           valueFrom = var.cookie_secure_arn
         },
         {
+          name      = "CORS_ORIGINS"
+          valueFrom = var.messages_allowed_origins_arn
+        },
+        {
           name      = "COC_EMAIL"
           valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_EMAIL::"
         },

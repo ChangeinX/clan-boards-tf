@@ -47,10 +47,8 @@ jobs:
           frontend_domain_names   = ["${{ secrets.FRONTEND_DOMAIN_NAMES }}"]
           frontend_certificate_arn = "${{ secrets.CERTIFICATE_ARN }}"
           messages_image = "${{ secrets.MESSAGES_IMAGE }}"
-          messages_allowed_origins = ["${{ secrets.MESSAGES_ALLOWED_ORIGINS }}"]
-          user_allowed_origins = ["${{ secrets.USER_ALLOWED_ORIGINS }}"]
           notifications_image = "${{ secrets.NOTIFICATIONS_IMAGE }}"
-          notifications_allowed_origins = ["${{ secrets.NOTIFICATIONS_ALLOWED_ORIGINS }}"]
+          cors_allowed_origins = ["${{ secrets.CORS_ALLOWED_ORIGINS }}"]
           vapid_secret_name = "${{ secrets.VAPID_SECRET_NAME }}"
           cookie_domain = "${{ secrets.COOKIE_DOMAIN }}"
           session_max_age = "${{ secrets.SESSION_MAX_AGE }}"

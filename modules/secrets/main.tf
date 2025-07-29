@@ -99,7 +99,7 @@ resource "aws_secretsmanager_secret" "messages_allowed_origins" {
 
 resource "aws_secretsmanager_secret_version" "messages_allowed_origins" {
   secret_id     = aws_secretsmanager_secret.messages_allowed_origins.id
-  secret_string = join(",", var.messages_allowed_origins)
+  secret_string = join(",", var.cors_allowed_origins)
 }
 
 resource "aws_secretsmanager_secret" "user_allowed_origins" {
@@ -108,7 +108,7 @@ resource "aws_secretsmanager_secret" "user_allowed_origins" {
 
 resource "aws_secretsmanager_secret_version" "user_allowed_origins" {
   secret_id     = aws_secretsmanager_secret.user_allowed_origins.id
-  secret_string = join(",", var.user_allowed_origins)
+  secret_string = join(",", var.cors_allowed_origins)
 }
 
 resource "aws_secretsmanager_secret" "notifications_allowed_origins" {
@@ -117,7 +117,7 @@ resource "aws_secretsmanager_secret" "notifications_allowed_origins" {
 
 resource "aws_secretsmanager_secret_version" "notifications_allowed_origins" {
   secret_id     = aws_secretsmanager_secret.notifications_allowed_origins.id
-  secret_string = join(",", var.notifications_allowed_origins)
+  secret_string = join(",", var.cors_allowed_origins)
 }
 
 resource "random_password" "jwt_signing_key" {
