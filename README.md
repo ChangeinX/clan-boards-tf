@@ -85,5 +85,5 @@ terraform apply
 ## Continuous Integration
 GitHub Actions validate the configuration on every pull request. Formatting and validation are run with OpenTofu.
 
-Pushing to `main` automatically applies the configuration for the `dev` environment. Tags matching `qa-*` or `prod-*` trigger deployments to `qa` and `prod`.
+Deployments read a single `TFVARS` secret from each GitHub environment. Pushing to `main` applies the `dev` environment while tags matching `qa-*` or `prod-*` apply `qa` and `prod`.
 
