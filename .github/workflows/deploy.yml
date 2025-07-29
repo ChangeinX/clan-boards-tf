@@ -52,6 +52,9 @@ jobs:
           vapid_secret_name = "${{ secrets.VAPID_SECRET_NAME }}"
           cookie_domain = "${{ secrets.COOKIE_DOMAIN }}"
           session_max_age = "${{ secrets.SESSION_MAX_AGE }}"
+          welcome_bucket_name = "${{ secrets.WELCOME_BUCKET_NAME }}"
+          welcome_domain_names = ["${{ secrets.WELCOME_DOMAIN_NAMES }}"]
+          welcome_certificate_arn = "${{ secrets.WELCOME_CERTIFICATE_ARN }}"
           EOF
         shell: bash
       - name: Initialize
