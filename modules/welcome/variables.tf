@@ -9,3 +9,8 @@ variable "certificate_arn" {
   type    = string
   default = null
 }
+
+variable "web_acl_id" {
+  type    = string
+  default = null
+}

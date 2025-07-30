@@ -80,3 +80,159 @@ resource "aws_wafv2_web_acl" "this" {
     }
   }
 }
+
+locals {
+  create_interface_waf = length(var.interface_ipv4_cidrs) + length(var.interface_ipv6_cidrs) > 0
+}
+
+resource "aws_wafv2_ip_set" "interface_v4_regional" {
+  count              = local.create_interface_waf && length(var.interface_ipv4_cidrs) > 0 ? 1 : 0
+  name               = "${var.app_name}-interface-v4-regional"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = var.interface_ipv4_cidrs
+}
+
+resource "aws_wafv2_ip_set" "interface_v6_regional" {
+  count              = local.create_interface_waf && length(var.interface_ipv6_cidrs) > 0 ? 1 : 0
+  name               = "${var.app_name}-interface-v6-regional"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV6"
+  addresses          = var.interface_ipv6_cidrs
+}
+
+resource "aws_wafv2_ip_set" "interface_v4_cf" {
+  count              = local.create_interface_waf && length(var.interface_ipv4_cidrs) > 0 ? 1 : 0
+  name               = "${var.app_name}-interface-v4-cf"
+  scope              = "CLOUDFRONT"
+  ip_address_version = "IPV4"
+  addresses          = var.interface_ipv4_cidrs
+}
+
+resource "aws_wafv2_ip_set" "interface_v6_cf" {
+  count              = local.create_interface_waf && length(var.interface_ipv6_cidrs) > 0 ? 1 : 0
+  name               = "${var.app_name}-interface-v6-cf"
+  scope              = "CLOUDFRONT"
+  ip_address_version = "IPV6"
+  addresses          = var.interface_ipv6_cidrs
+}
+
+resource "aws_wafv2_web_acl" "interface_regional" {
+  count = local.create_interface_waf ? 1 : 0
+  name  = "${var.app_name}-interface-regional"
+  scope = "REGIONAL"
+
+  default_action {
+    block {}
+  }
+
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v4_regional
+    content {
+      name     = "allow-interface-v4"
+      priority = 0
+
+      action {
+        allow {}
+      }
+
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v4"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v6_regional
+    content {
+      name     = "allow-interface-v6"
+      priority = length(aws_wafv2_ip_set.interface_v4_regional) > 0 ? 1 : 0
+
+      action {
+        allow {}
+      }
+
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v6"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${var.app_name}-interface-regional"
+    sampled_requests_enabled   = true
+  }
+}
+
+resource "aws_wafv2_web_acl" "interface_cf" {
+  count = local.create_interface_waf ? 1 : 0
+  name  = "${var.app_name}-interface-cf"
+  scope = "CLOUDFRONT"
+
+  default_action {
+    block {}
+  }
+
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v4_cf
+    content {
+      name     = "allow-interface-v4"
+      priority = 0
+
+      action {
+        allow {}
+      }
+
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v4"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v6_cf
+    content {
+      name     = "allow-interface-v6"
+      priority = length(aws_wafv2_ip_set.interface_v4_cf) > 0 ? 1 : 0
+
+      action {
+        allow {}
+      }
+
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v6"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${var.app_name}-interface-cf"
+    sampled_requests_enabled   = true
+  }
+}
