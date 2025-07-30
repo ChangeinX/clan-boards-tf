@@ -50,8 +50,9 @@ frontend_certificate_arn = "<acm cert arn for frontend>"
 welcome_bucket_name = "<s3 bucket for welcome page>"
 welcome_domain_names = ["welcome.example.com"]
 welcome_certificate_arn = "<acm cert arn for welcome>"
-interface_ipv4_cidrs   = ["203.0.113.0/24"]
-interface_ipv6_cidrs   = ["2001:db8::/48"]
+# Optional: restrict access to the interface by IP
+interface_ipv4_cidrs   = []
+interface_ipv6_cidrs   = []
 ```
 
 2. Create the state bucket and DynamoDB table using the helper script. The

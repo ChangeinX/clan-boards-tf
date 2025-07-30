@@ -126,35 +126,47 @@ resource "aws_wafv2_web_acl" "interface_regional" {
     block {}
   }
 
-  rule {
-    name     = "allow-interface"
-    priority = 0
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v4_regional
+    content {
+      name     = "allow-interface-v4"
+      priority = 0
 
-    action {
-      allow {}
-    }
+      action {
+        allow {}
+      }
 
-    statement {
-      or_statement {
-        dynamic "statement" {
-          for_each = aws_wafv2_ip_set.interface_v4_regional
-          content {
-            ip_set_reference_statement { arn = statement.value.arn }
-          }
-        }
-        dynamic "statement" {
-          for_each = aws_wafv2_ip_set.interface_v6_regional
-          content {
-            ip_set_reference_statement { arn = statement.value.arn }
-          }
-        }
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v4"
+        sampled_requests_enabled   = true
       }
     }
+  }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "allow-interface"
-      sampled_requests_enabled   = true
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v6_regional
+    content {
+      name     = "allow-interface-v6"
+      priority = length(aws_wafv2_ip_set.interface_v4_regional) > 0 ? 1 : 0
+
+      action {
+        allow {}
+      }
+
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v6"
+        sampled_requests_enabled   = true
+      }
     }
   }
 
@@ -174,35 +186,47 @@ resource "aws_wafv2_web_acl" "interface_cf" {
     block {}
   }
 
-  rule {
-    name     = "allow-interface"
-    priority = 0
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v4_cf
+    content {
+      name     = "allow-interface-v4"
+      priority = 0
 
-    action {
-      allow {}
-    }
+      action {
+        allow {}
+      }
 
-    statement {
-      or_statement {
-        dynamic "statement" {
-          for_each = aws_wafv2_ip_set.interface_v4_cf
-          content {
-            ip_set_reference_statement { arn = statement.value.arn }
-          }
-        }
-        dynamic "statement" {
-          for_each = aws_wafv2_ip_set.interface_v6_cf
-          content {
-            ip_set_reference_statement { arn = statement.value.arn }
-          }
-        }
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v4"
+        sampled_requests_enabled   = true
       }
     }
+  }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "allow-interface"
-      sampled_requests_enabled   = true
+  dynamic "rule" {
+    for_each = aws_wafv2_ip_set.interface_v6_cf
+    content {
+      name     = "allow-interface-v6"
+      priority = length(aws_wafv2_ip_set.interface_v4_cf) > 0 ? 1 : 0
+
+      action {
+        allow {}
+      }
+
+      statement {
+        ip_set_reference_statement { arn = rule.value.arn }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "allow-interface-v6"
+        sampled_requests_enabled   = true
+      }
     }
   }
 

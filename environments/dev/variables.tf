@@ -160,9 +160,11 @@ variable "welcome_certificate_arn" {
 variable "interface_ipv4_cidrs" {
   description = "IPv4 CIDRs allowed to access the interface"
   type        = list(string)
+  default     = []
 }
 
 variable "interface_ipv6_cidrs" {
   description = "IPv6 CIDRs allowed to access the interface"
   type        = list(string)
+  default     = []
 }
