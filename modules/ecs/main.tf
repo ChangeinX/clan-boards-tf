@@ -230,6 +230,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.session_max_age_arn,
         var.cookie_domain_arn,
         var.cookie_secure_arn,
+        var.redis_url_arn,
         "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO"
       ]
     }]
@@ -349,6 +350,10 @@ resource "aws_ecs_task_definition" "worker" {
           valueFrom = var.messages_allowed_origins_arn
         },
         {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_arn
+        },
+        {
           name      = "COC_EMAIL"
           valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_EMAIL::"
         },
@@ -457,6 +462,10 @@ resource "aws_ecs_task_definition" "user" {
         {
           name      = "COOKIE_SECURE"
           valueFrom = var.cookie_secure_arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_arn
         }
       ]
     }
@@ -550,6 +559,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "COOKIE_SECURE"
           valueFrom = var.cookie_secure_arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_arn
         }
       ]
     }
@@ -651,6 +664,10 @@ resource "aws_ecs_task_definition" "notifications" {
         {
           name      = "COOKIE_SECURE"
           valueFrom = var.cookie_secure_arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_arn
         }
       ]
     }

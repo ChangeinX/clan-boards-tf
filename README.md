@@ -12,6 +12,7 @@ This configuration provisions an AWS environment for a containerized web applica
   environments which is associated with both CloudFront distributions and the
   ALB.
 - `rds` creates the Postgres database in the private subnets
+- `redis` provisions an ElastiCache cluster and stores its connection URL in Secrets Manager
 - `secrets` stores application configuration in Secrets Manager for the ECS tasks.
 - `ecs` sets up the ECS cluster, task definitions and services. The user service is registered in Cloud Map so other tasks can reach it via `user.<app_name>.local` and is exposed through the ALB at `/api/v1/friends`. It now requires the chat table ARN and related secret ARNs so tasks can read and write chat messages.
   The user task also receives database credentials from Secrets Manager.

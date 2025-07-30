@@ -65,6 +65,14 @@ module "notifications" {
   chat_table_stream_arn = module.chat.chat_table_stream_arn
 }
 
+module "redis" {
+  source     = "../../modules/redis"
+  app_name   = var.app_name
+  vpc_id     = module.networking.vpc_id
+  subnet_ids = module.networking.private_subnet_ids
+  vpc_cidr   = module.networking.vpc_cidr
+}
+
 module "ecs" {
   source                             = "../../modules/ecs"
   app_name                           = var.app_name
@@ -94,6 +102,7 @@ module "ecs" {
   session_max_age_arn                = module.secrets.session_max_age_arn
   cookie_domain_arn                  = module.secrets.cookie_domain_arn
   cookie_secure_arn                  = module.secrets.cookie_secure_arn
+  redis_url_arn                      = module.redis.redis_url_arn
   messages_allowed_origins_arn       = module.secrets.messages_allowed_origins_arn
   user_allowed_origins_arn           = module.secrets.user_allowed_origins_arn
   notifications_allowed_origins_arn  = module.secrets.notifications_allowed_origins_arn
