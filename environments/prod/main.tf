@@ -71,6 +71,10 @@ module "redis" {
   vpc_cidr   = module.networking.vpc_cidr
 }
 
+data "aws_secretsmanager_secret" "openai_moderation" {
+  name = "${var.app_env}/openai/moderation"
+}
+
 module "ecs" {
   source                             = "../../modules/ecs"
   app_name                           = var.app_name
@@ -107,6 +111,7 @@ module "ecs" {
   messages_allowed_origins_name      = module.secrets.messages_allowed_origins_name
   user_allowed_origins_name          = module.secrets.user_allowed_origins_name
   notifications_allowed_origins_name = module.secrets.notifications_allowed_origins_name
+  openai_moderation_arn              = data.aws_secretsmanager_secret.openai_moderation.arn
   notifications_target_group_arn     = module.alb.notifications_target_group_arn
   notifications_image                = var.notifications_image
   notifications_queue_url            = module.notifications.queue_url

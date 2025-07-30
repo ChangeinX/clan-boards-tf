@@ -41,3 +41,5 @@ variable "session_max_age_arn" { type = string }
 variable "cookie_domain_arn" { type = string }
 variable "cookie_secure_arn" { type = string }
 variable "redis_url_arn" { type = string }
+
+variable "openai_moderation_arn" { type = string }
