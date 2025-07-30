@@ -30,7 +30,7 @@ module "alb" {
   public_subnet_ids = module.networking.public_subnet_ids
   certificate_arn   = var.certificate_arn
   api_host          = var.api_host
-  waf_web_acl_arn   = module.waf.web_acl_arn
+  waf_web_acl_arn   = coalesce(module.waf.interface_regional_web_acl_arn, module.waf.web_acl_arn)
 }
 
 module "chat" {
