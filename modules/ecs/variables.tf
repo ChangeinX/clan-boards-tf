@@ -40,3 +40,4 @@ variable "jwt_signing_key_arn" { type = string }
 variable "session_max_age_arn" { type = string }
 variable "cookie_domain_arn" { type = string }
 variable "cookie_secure_arn" { type = string }
+variable "redis_url_arn" { type = string }
