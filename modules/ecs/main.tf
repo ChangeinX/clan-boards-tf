@@ -530,6 +530,14 @@ resource "aws_ecs_task_definition" "messages" {
           valueFrom = var.database_url_arn
         },
         {
+          name      = "DATABASE_USERNAME"
+          valueFrom = var.database_username_arn
+        },
+        {
+          name      = "DATABASE_PASSWORD"
+          valueFrom = var.database_password_arn
+        },
+        {
           name      = "SECRET_KEY"
           valueFrom = var.secret_key_arn
         },
