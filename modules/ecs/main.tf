@@ -468,10 +468,6 @@ resource "aws_ecs_task_definition" "user" {
         {
           name      = "REDIS_URL"
           valueFrom = var.redis_url_arn
-        },
-        {
-          name      = "OPENAI_API_KEY"
-          valueFrom = var.openai_moderation_arn
         }
       ]
     }
@@ -581,6 +577,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "PERSPECTIVE_API_KEY"
           valueFrom = var.perspective_api_key_arn
+         },
+         {
+          name      = "OPENAI_API_KEY"
+          valueFrom = var.openai_moderation_arn
         }
       ]
     }
