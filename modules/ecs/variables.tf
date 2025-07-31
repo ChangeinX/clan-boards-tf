@@ -43,3 +43,4 @@ variable "cookie_secure_arn" { type = string }
 variable "redis_url_arn" { type = string }
 
 variable "openai_moderation_arn" { type = string }
+variable "perspective_api_key_arn" { type = string }
