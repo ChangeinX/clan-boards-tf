@@ -232,6 +232,7 @@ resource "aws_iam_role_policy" "execution_secrets" {
         var.cookie_secure_arn,
         var.redis_url_arn,
         var.openai_moderation_arn,
+        var.perspective_api_key_arn,
         "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO"
       ]
     }]
@@ -572,6 +573,10 @@ resource "aws_ecs_task_definition" "messages" {
         {
           name      = "REDIS_URL"
           valueFrom = var.redis_url_arn
+        },
+        {
+          name      = "PERSPECTIVE_API_KEY"
+          valueFrom = var.perspective_api_key_arn
         },
         {
           name      = "OPENAI_API_KEY"
