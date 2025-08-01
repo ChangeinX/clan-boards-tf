@@ -10,7 +10,7 @@ data "archive_file" "lambda" {
 
 resource "aws_lambda_function" "stream" {
   function_name    = "${var.app_name}-chat-stream"
-  runtime          = "nodejs18.x"
+  runtime          = "nodejs20.x"
   handler          = "index.handler"
   role             = aws_iam_role.lambda.arn
   filename         = data.archive_file.lambda.output_path
