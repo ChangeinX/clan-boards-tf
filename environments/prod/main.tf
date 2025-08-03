@@ -157,3 +157,8 @@ module "welcome" {
   domain_names    = var.welcome_domain_names
   certificate_arn = var.welcome_certificate_arn
 }
+
+module "ecr_cleanup" {
+  source   = "../../modules/ecr_cleanup"
+  app_name = var.app_name
+}

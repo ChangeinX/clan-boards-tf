@@ -21,6 +21,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
 - `welcome` creates a private S3 bucket with a CloudFront distribution using origin access control.
 - `chat` provisions a DynamoDB table used for the chat service with streams enabled. The table name, ARN and stream ARN are exported for other modules.
+- `ecr_cleanup` deploys a Lambda that runs weekly to remove old ECR images, keeping the 11 most recently pushed.
 
 Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker also loads `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the user service at `user.<app_name>.local` or through the ALB path `/api/v1/friends`. The messages task now loads `OPENAI_API_KEY` from the `{env}/openai/moderation` secret and `PERSPECTIVE_API_KEY` from the `{env}/perspective/moderation` secret.
 ## Usage

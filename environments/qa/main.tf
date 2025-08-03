@@ -161,3 +161,8 @@ module "welcome" {
   certificate_arn = var.welcome_certificate_arn
   web_acl_id      = module.waf.interface_cloudfront_web_acl_arn
 }
+
+module "ecr_cleanup" {
+  source   = "../../modules/ecr_cleanup"
+  app_name = var.app_name
+}
