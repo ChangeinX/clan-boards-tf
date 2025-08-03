@@ -19,7 +19,9 @@ def lambda_handler(event, context):
     images.sort(key=lambda x: x.get("imagePushedAt", datetime(1970, 1, 1, tzinfo=timezone.utc)), reverse=True)
     old_images = images[KEEP:]
     image_ids = [{"imageDigest": img["imageDigest"]} for img in old_images if "imageDigest" in img]
-    if image_ids:
-      ECR.batch_delete_image(repositoryName=repo, imageIds=image_ids)
+    for i in range(0, len(image_ids), 100):
+      batch = image_ids[i : i + 100]
+      if batch:
+        ECR.batch_delete_image(repositoryName=repo, imageIds=batch)
 
   return {"status": "ok"}
