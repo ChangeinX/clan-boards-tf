@@ -88,11 +88,13 @@ module "ecs" {
   worker_target_group_arn            = module.alb.api_target_group_arn
   messages_target_group_arn          = module.alb.messages_target_group_arn
   user_target_group_arn              = module.alb.user_target_group_arn
+  recruiting_target_group_arn        = module.alb.recruiting_target_group_arn
   listener_arn                       = module.alb.https_listener_arn
   region                             = var.region
   worker_image                       = var.worker_image
   user_image                         = var.user_image
   messages_image                     = var.messages_image
+  recruiting_image                   = var.recruiting_image
   chat_table_arn                     = module.chat.chat_table_arn
   app_env_arn                        = module.secrets.app_env_arn
   database_url_arn                   = module.secrets.database_url_arn

@@ -133,6 +133,27 @@ resource "aws_lb_target_group" "notifications" {
   }
 }
 
+resource "aws_lb_target_group" "recruiting" {
+  name_prefix = "${substr(var.app_name, 0, 2)}rec-"
+  port        = 8040
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  health_check {
+    path                = "/api/v1/health"
+    interval            = 30
+    timeout             = 20
+    healthy_threshold   = 5
+    unhealthy_threshold = 10
+    matcher             = "200-399"
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
@@ -249,6 +270,29 @@ resource "aws_lb_listener_rule" "notifications" {
   condition {
     path_pattern {
       values = ["/api/v1/notifications*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "recruiting" {
+  count        = var.api_host == null ? 0 : 1
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 115
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.recruiting.arn
+  }
+
+  condition {
+    host_header {
+      values = [var.api_host]
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/recruiting*"]
     }
   }
 }

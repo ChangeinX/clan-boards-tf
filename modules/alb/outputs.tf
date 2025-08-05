@@ -33,3 +33,7 @@ output "notifications_target_group_arn" {
   value = aws_lb_target_group.notifications.arn
 }
 
+output "recruiting_target_group_arn" {
+  value = aws_lb_target_group.recruiting.arn
+}
+
