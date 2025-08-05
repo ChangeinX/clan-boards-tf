@@ -14,8 +14,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `rds` creates the Postgres database in the private subnets
 - `redis` provisions an ElastiCache cluster and stores its connection URL in Secrets Manager
 - `secrets` stores application configuration in Secrets Manager for the ECS tasks.
-- `ecs` sets up the ECS cluster, task definitions and services. The user service is registered in Cloud Map so other tasks can reach it via `user.<app_name>.local` and is exposed through the ALB at `/api/v1/friends`. It now requires the chat table ARN and related secret ARNs so tasks can read and write chat messages.
-  The user task also receives database credentials from Secrets Manager.
+- `ecs` sets up the ECS cluster, task definitions and services. The user service is registered in Cloud Map so other tasks can reach it via `user.<app_name>.local` and is exposed through the ALB at `/api/v1/friends`. It now requires the chat table ARN and related secret ARNs so tasks can read and write chat messages. The user task also receives database credentials from Secrets Manager. The recruiting service shares the worker's configuration and is exposed at `/api/v1/recruiting`.
 - `notifications` connects the chat table stream to an SQS outbox with a Lambda function, exposes VAPID keys for push notifications and now outputs the outbox and DLQ queue URLs.
 - `nat_gateway` provides outbound internet access for private subnets using an Elastic IP so Fargate tasks egress from a static address. It requires no maintenance or SSH access.
 - `frontend` creates an S3 bucket configured for static website hosting and a CloudFront distribution that forwards the `If-None-Match` header so the web app can be served directly from S3.
@@ -23,7 +22,7 @@ This configuration provisions an AWS environment for a containerized web applica
 - `chat` provisions a DynamoDB table used for the chat service with streams enabled. The table name, ARN and stream ARN are exported for other modules.
 - `ecr_cleanup` deploys a Lambda that runs weekly to remove old ECR images, keeping the 11 most recently pushed.
 
-Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker also loads `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the user service at `user.<app_name>.local` or through the ALB path `/api/v1/friends`. The messages task now loads `OPENAI_API_KEY` from the `{env}/openai/moderation` secret and `PERSPECTIVE_API_KEY` from the `{env}/perspective/moderation` secret.
+Each container logs to its own CloudWatch log group and the worker receives its environment via Secrets Manager along with Google OAuth credentials. The worker also loads `COC_EMAIL` and `COC_PASSWORD` from a shared secret. The worker talks to the user service at `user.<app_name>.local` or through the ALB path `/api/v1/friends`. The messages task now loads `OPENAI_API_KEY` from the `{env}/openai/moderation` secret and `PERSPECTIVE_API_KEY` from the `{env}/perspective/moderation` secret. The recruiting service uses the same secrets as the worker and is available at `/api/v1/recruiting`.
 ## Usage
 1. Set the required variables in a `terraform.tfvars` file:
 
@@ -31,6 +30,8 @@ Each container logs to its own CloudWatch log group and the worker receives its 
 worker_image        = "<worker image>"
 user_image          = "<user service image>"
 messages_image      = "<messages service image>"
+notifications_image = "<notifications service image>"
+recruiting_image    = "<recruiting service image>"
 db_allowed_ip = "<your ip>/32"
 db_password  = "<strong password>"
 db_username  = "postgres"

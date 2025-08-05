@@ -44,6 +44,14 @@ resource "aws_security_group" "ecs" {
     security_groups = [var.alb_sg_id]
   }
 
+  # allow traffic from the ALB to the recruiting service
+  ingress {
+    protocol        = "tcp"
+    from_port       = 8040
+    to_port         = 8040
+    security_groups = [var.alb_sg_id]
+  }
+
   # allow internal access to the user service
   ingress {
     protocol  = "tcp"
@@ -75,6 +83,10 @@ resource "aws_cloudwatch_log_group" "messages" {
 
 resource "aws_cloudwatch_log_group" "notifications" {
   name = "/ecs/${var.app_name}-notifications"
+}
+
+resource "aws_cloudwatch_log_group" "recruiting" {
+  name = "/ecs/${var.app_name}-recruiting"
 }
 
 # IAM roles
@@ -692,6 +704,107 @@ resource "aws_ecs_task_definition" "notifications" {
   ])
 }
 
+resource "aws_ecs_task_definition" "recruiting" {
+  family                   = "${var.app_name}-recruiting"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "recruiting"
+      image     = var.recruiting_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8040
+          hostPort      = 8040
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8040"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.recruiting.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "recruiting"
+        }
+      }
+      secrets = [
+        {
+          name      = "APP_ENV"
+          valueFrom = var.app_env_arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = var.database_url_arn
+        },
+        {
+          name      = "SECRET_KEY"
+          valueFrom = var.secret_key_arn
+        },
+        {
+          name      = "COC_API_TOKEN"
+          valueFrom = var.coc_api_token_arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_ID"
+          valueFrom = var.google_client_id_arn
+        },
+        {
+          name      = "GOOGLE_CLIENT_SECRET"
+          valueFrom = var.google_client_secret_arn
+        },
+        {
+          name      = "JWT_SIGNING_KEY"
+          valueFrom = var.jwt_signing_key_arn
+        },
+        {
+          name      = "SESSION_MAX_AGE"
+          valueFrom = var.session_max_age_arn
+        },
+        {
+          name      = "COOKIE_DOMAIN"
+          valueFrom = var.cookie_domain_arn
+        },
+        {
+          name      = "COOKIE_SECURE"
+          valueFrom = var.cookie_secure_arn
+        },
+        {
+          name      = "CORS_ORIGINS"
+          valueFrom = var.messages_allowed_origins_arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_arn
+        },
+        {
+          name      = "COC_EMAIL"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_EMAIL::"
+        },
+        {
+          name      = "COC_PASSWORD"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_PASSWORD::"
+        }
+      ]
+    }
+  ])
+}
+
 
 resource "aws_ecs_service" "worker" {
   name            = "${var.app_name}-worker-svc"
@@ -778,6 +891,28 @@ resource "aws_ecs_service" "notifications" {
     target_group_arn = var.notifications_target_group_arn
     container_name   = "notifications"
     container_port   = 8030
+  }
+  depends_on = [var.listener_arn]
+
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+}
+
+resource "aws_ecs_service" "recruiting" {
+  name            = "${var.app_name}-recruiting-svc"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.recruiting.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  load_balancer {
+    target_group_arn = var.recruiting_target_group_arn
+    container_name   = "recruiting"
+    container_port   = 8040
   }
   depends_on = [var.listener_arn]
 

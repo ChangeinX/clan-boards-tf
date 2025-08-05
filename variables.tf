@@ -106,6 +106,11 @@ variable "notifications_image" {
   type        = string
 }
 
+variable "recruiting_image" {
+  description = "Docker image for the recruiting service"
+  type        = string
+}
+
 variable "vapid_secret_name" {
   description = "Name of the VAPID keys secret"
   type        = string
