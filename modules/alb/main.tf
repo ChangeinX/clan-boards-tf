@@ -223,7 +223,7 @@ resource "aws_lb_listener_rule" "user" {
 
   condition {
     path_pattern {
-      values = ["/api/v1/friends*", "/api/v1/auth*", "/api/v1/logout*"]
+      values = ["/api/v1/friends*", "/api/v1/auth*", "/api/v1/logout*", "/api/v1/users*"]
     }
   }
 }

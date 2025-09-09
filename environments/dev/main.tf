@@ -32,7 +32,7 @@ module "alb" {
   public_subnet_ids = module.networking.public_subnet_ids
   certificate_arn   = var.certificate_arn
   api_host          = var.api_host
-  waf_web_acl_arn   = coalesce(module.waf.interface_regional_web_acl_arn, module.waf.web_acl_arn)
+  waf_web_acl_arn   = module.waf.web_acl_arn
 }
 
 module "chat" {
@@ -153,7 +153,7 @@ module "frontend" {
   bucket_name     = var.frontend_bucket_name
   domain_names    = var.frontend_domain_names
   certificate_arn = var.frontend_certificate_arn
-  web_acl_id      = module.waf.interface_cloudfront_web_acl_arn
+  web_acl_id      = null
 }
 
 module "welcome" {
@@ -161,7 +161,7 @@ module "welcome" {
   bucket_name     = var.welcome_bucket_name
   domain_names    = var.welcome_domain_names
   certificate_arn = var.welcome_certificate_arn
-  web_acl_id      = module.waf.interface_cloudfront_web_acl_arn
+  web_acl_id      = null
 }
 
 module "ecr_cleanup" {
