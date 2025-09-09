@@ -173,3 +173,20 @@ variable "interface_ipv6_cidrs" {
   type        = list(string)
   default     = []
 }
+
+variable "coc_email" {
+  description = "Clash of Clans developer portal email"
+  type        = string
+  sensitive   = true
+}
+
+variable "coc_password" {
+  description = "Clash of Clans developer portal password"
+  type        = string
+  sensitive   = true
+}
+
+variable "lambda_artifacts_bucket" {
+  description = "S3 bucket for Lambda deployment artifacts"
+  type        = string
+}

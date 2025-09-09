@@ -77,3 +77,11 @@ output "cookie_domain_arn" {
 output "cookie_secure_arn" {
   value = aws_secretsmanager_secret.cookie_secure.arn
 }
+
+output "coc_email_arn" {
+  value = aws_secretsmanager_secret.coc_email.arn
+}
+
+output "coc_password_arn" {
+  value = aws_secretsmanager_secret.coc_password.arn
+}
