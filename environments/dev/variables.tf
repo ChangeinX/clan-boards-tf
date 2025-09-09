@@ -111,6 +111,11 @@ variable "recruiting_image" {
   type        = string
 }
 
+variable "clan_data_image" {
+  description = "Docker image for the clan-data service"
+  type        = string
+}
+
 variable "vapid_secret_name" {
   description = "Name of the VAPID keys secret"
   type        = string

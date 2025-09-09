@@ -7,6 +7,7 @@ variable "messages_target_group_arn" { type = string }
 variable "user_target_group_arn" { type = string }
 variable "notifications_target_group_arn" { type = string }
 variable "recruiting_target_group_arn" { type = string }
+variable "clan_data_target_group_arn" { type = string }
 variable "listener_arn" { type = string }
 variable "region" { type = string }
 variable "worker_image" { type = string }
@@ -14,6 +15,7 @@ variable "user_image" { type = string }
 variable "messages_image" { type = string }
 variable "notifications_image" { type = string }
 variable "recruiting_image" { type = string }
+variable "clan_data_image" { type = string }
 
 variable "chat_table_arn" { type = string }
 

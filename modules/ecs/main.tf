@@ -52,6 +52,14 @@ resource "aws_security_group" "ecs" {
     security_groups = [var.alb_sg_id]
   }
 
+  # allow traffic from the ALB to the clan-data service
+  ingress {
+    protocol        = "tcp"
+    from_port       = 8050
+    to_port         = 8050
+    security_groups = [var.alb_sg_id]
+  }
+
   # allow internal access to the user service
   ingress {
     protocol  = "tcp"
@@ -87,6 +95,10 @@ resource "aws_cloudwatch_log_group" "notifications" {
 
 resource "aws_cloudwatch_log_group" "recruiting" {
   name = "/ecs/${var.app_name}-recruiting"
+}
+
+resource "aws_cloudwatch_log_group" "clan_data" {
+  name = "/ecs/${var.app_name}-clan-data"
 }
 
 # IAM roles
@@ -805,6 +817,83 @@ resource "aws_ecs_task_definition" "recruiting" {
   ])
 }
 
+resource "aws_ecs_task_definition" "clan_data" {
+  family                   = "${var.app_name}-clan-data"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
+  execution_role_arn = aws_iam_role.task_execution.arn
+  task_role_arn      = aws_iam_role.task_with_db.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "clan-data"
+      image     = var.clan_data_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8050
+          hostPort      = 8050
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = "8050"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.clan_data.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "clan-data"
+        }
+      }
+      secrets = [
+        {
+          name      = "APP_ENV"
+          valueFrom = var.app_env_arn
+        },
+        {
+          name      = "DATABASE_URL"
+          valueFrom = var.database_url_arn
+        },
+        {
+          name      = "SECRET_KEY"
+          valueFrom = var.secret_key_arn
+        },
+        {
+          name      = "JWT_SIGNING_KEY"
+          valueFrom = var.jwt_signing_key_arn
+        },
+        {
+          name      = "SESSION_MAX_AGE"
+          valueFrom = var.session_max_age_arn
+        },
+        {
+          name      = "COOKIE_DOMAIN"
+          valueFrom = var.cookie_domain_arn
+        },
+        {
+          name      = "COOKIE_SECURE"
+          valueFrom = var.cookie_secure_arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_arn
+        }
+      ]
+    }
+  ])
+}
+
 
 resource "aws_ecs_service" "worker" {
   name            = "${var.app_name}-worker-svc"
@@ -913,6 +1002,28 @@ resource "aws_ecs_service" "recruiting" {
     target_group_arn = var.recruiting_target_group_arn
     container_name   = "recruiting"
     container_port   = 8040
+  }
+  depends_on = [var.listener_arn]
+
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+}
+
+resource "aws_ecs_service" "clan_data" {
+  name            = "${var.app_name}-clan-data-svc"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.clan_data.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.subnet_ids
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }
+  load_balancer {
+    target_group_arn = var.clan_data_target_group_arn
+    container_name   = "clan-data"
+    container_port   = 8050
   }
   depends_on = [var.listener_arn]
 
