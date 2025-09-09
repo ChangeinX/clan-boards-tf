@@ -22,3 +22,15 @@ variable "cookie_secure" {
   type    = bool
   default = true
 }
+
+variable "coc_email" {
+  description = "Clash of Clans developer portal email"
+  type        = string
+  sensitive   = true
+}
+
+variable "coc_password" {
+  description = "Clash of Clans developer portal password"
+  type        = string
+  sensitive   = true
+}

@@ -127,6 +127,11 @@ variable "backend_dynamodb_table" {
   type        = string
 }
 
+variable "lambda_artifacts_bucket" {
+  description = "S3 bucket for Lambda deployment artifacts"
+  type        = string
+}
+
 variable "frontend_bucket_name" {
   description = "S3 bucket to host the front-end"
   type        = string

@@ -41,3 +41,5 @@ terraform.rc
 .DS_Store
 
 *.pem
+
+scripts/.env_state/*

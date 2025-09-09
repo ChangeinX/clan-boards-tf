@@ -160,3 +160,21 @@ resource "aws_secretsmanager_secret_version" "cookie_secure" {
   secret_id     = aws_secretsmanager_secret.cookie_secure.id
   secret_string = tostring(var.cookie_secure)
 }
+
+resource "aws_secretsmanager_secret" "coc_email" {
+  name = "${var.app_name}-coc-email"
+}
+
+resource "aws_secretsmanager_secret_version" "coc_email" {
+  secret_id     = aws_secretsmanager_secret.coc_email.id
+  secret_string = var.coc_email
+}
+
+resource "aws_secretsmanager_secret" "coc_password" {
+  name = "${var.app_name}-coc-password"
+}
+
+resource "aws_secretsmanager_secret_version" "coc_password" {
+  secret_id     = aws_secretsmanager_secret.coc_password.id
+  secret_string = var.coc_password
+}

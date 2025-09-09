@@ -12,6 +12,8 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_caller_identity" "current" {}
+
 module "networking" {
   source   = "../../modules/networking"
   region   = var.region
@@ -48,6 +50,8 @@ module "secrets" {
   db_endpoint          = module.rds.db_endpoint
   db_username          = var.db_username
   db_password          = var.db_password
+  coc_email            = var.coc_email
+  coc_password         = var.coc_password
   chat_table           = module.chat.chat_table_name
   coc_api_token        = var.coc_api_token
   google_client_id     = var.google_client_id
@@ -167,4 +171,23 @@ module "welcome" {
 module "ecr_cleanup" {
   source   = "../../modules/ecr_cleanup"
   app_name = var.app_name
+}
+
+module "lambda_artifacts" {
+  source      = "../../modules/lambda-artifacts"
+  bucket_name = var.lambda_artifacts_bucket
+}
+
+module "refresh_worker" {
+  source                  = "../../modules/refresh-worker"
+  app_name                = var.app_name
+  app_env                 = var.app_env
+  lambda_artifacts_bucket = module.lambda_artifacts.bucket_name
+  database_url_arn        = module.secrets.database_url_arn
+  redis_url_arn           = module.redis.redis_url_arn
+  coc_email_arn           = module.secrets.coc_email_arn
+  coc_password_arn        = module.secrets.coc_password_arn
+  vpc_id                  = module.networking.vpc_id
+  lambda_subnet_ids       = module.networking.private_subnet_ids
+  depends_on              = [module.lambda_artifacts]
 }
