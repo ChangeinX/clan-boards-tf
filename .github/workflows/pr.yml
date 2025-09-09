@@ -112,8 +112,7 @@ jobs:
             const fs = require('fs');
             const body = fs.readFileSync(process.env.SUMMARY_PATH, 'utf8');
             const marker = '<!-- tofu-plan-comment -->';
-            const finalBody = `${marker}
-${body}`;
+            const finalBody = `${marker}\n${body}`;
 
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
