@@ -34,3 +34,4 @@ variable "coc_password" {
   type        = string
   sensitive   = true
 }
+

@@ -1,10 +1,3 @@
-output "clan_boards_api_repository_url" {
-  value = aws_ecr_repository.clan_boards_api.repository_url
-}
-
-output "clan_boards_api_repository_arn" {
-  value = aws_ecr_repository.clan_boards_api.arn
-}
 
 output "message_service_repository_url" {
   value = aws_ecr_repository.message_service.repository_url
