@@ -49,26 +49,6 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
-resource "aws_lb_target_group" "api" {
-  name_prefix = "${substr(var.app_name, 0, 2)}api-"
-  port        = 8001
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  health_check {
-    path                = "/api/v1/health"
-    interval            = 30
-    timeout             = 20
-    healthy_threshold   = 5
-    unhealthy_threshold = 10
-    matcher             = "200-399"
-  }
-}
 
 resource "aws_lb_target_group" "messages" {
   name_prefix = "${substr(var.app_name, 0, 2)}msg-"
@@ -249,28 +229,6 @@ resource "aws_lb_listener_rule" "user" {
   }
 }
 
-resource "aws_lb_listener_rule" "api" {
-  count        = var.api_host == null ? 0 : 1
-  listener_arn = aws_lb_listener.https.arn
-  priority     = 500
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
-  }
-
-  condition {
-    host_header {
-      values = [var.api_host]
-    }
-  }
-
-  condition {
-    path_pattern {
-      values = ["/api/v1*"]
-    }
-  }
-}
 
 resource "aws_lb_listener_rule" "notifications" {
   count        = var.api_host == null ? 0 : 1

@@ -50,10 +50,10 @@ module "secrets" {
   db_endpoint          = module.rds.db_endpoint
   db_username          = var.db_username
   db_password          = var.db_password
-  coc_email            = var.coc_email
-  coc_password         = var.coc_password
   chat_table           = module.chat.chat_table_name
   coc_api_token        = var.coc_api_token
+  coc_email            = var.coc_email
+  coc_password         = var.coc_password
   google_client_id     = var.google_client_id
   google_client_secret = var.google_client_secret
   cors_allowed_origins = var.cors_allowed_origins
@@ -91,14 +91,12 @@ module "ecs" {
   vpc_id                             = module.networking.vpc_id
   subnet_ids                         = module.networking.private_subnet_ids
   alb_sg_id                          = module.alb.alb_sg_id
-  worker_target_group_arn            = module.alb.api_target_group_arn
   messages_target_group_arn          = module.alb.messages_target_group_arn
   user_target_group_arn              = module.alb.user_target_group_arn
   recruiting_target_group_arn        = module.alb.recruiting_target_group_arn
   clan_data_target_group_arn         = module.alb.clan_data_target_group_arn
   listener_arn                       = module.alb.https_listener_arn
   region                             = var.region
-  worker_image                       = var.worker_image
   user_image                         = var.user_image
   messages_image                     = var.messages_image
   recruiting_image                   = var.recruiting_image
@@ -127,6 +125,8 @@ module "ecs" {
   notifications_allowed_origins_name = module.secrets.notifications_allowed_origins_name
   openai_moderation_arn              = data.aws_secretsmanager_secret.openai_moderation.arn
   perspective_api_key_arn            = data.aws_secretsmanager_secret.perspective_api.arn
+  coc_email_arn                      = module.secrets.coc_email_arn
+  coc_password_arn                   = module.secrets.coc_password_arn
   notifications_target_group_arn     = module.alb.notifications_target_group_arn
   notifications_image                = var.notifications_image
   notifications_queue_url            = module.notifications.queue_url
