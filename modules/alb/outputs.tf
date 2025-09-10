@@ -37,3 +37,7 @@ output "recruiting_target_group_arn" {
   value = aws_lb_target_group.recruiting.arn
 }
 
+output "clan_data_target_group_arn" {
+  value = aws_lb_target_group.clan_data.arn
+}
+

@@ -95,12 +95,14 @@ module "ecs" {
   messages_target_group_arn          = module.alb.messages_target_group_arn
   user_target_group_arn              = module.alb.user_target_group_arn
   recruiting_target_group_arn        = module.alb.recruiting_target_group_arn
+  clan_data_target_group_arn         = module.alb.clan_data_target_group_arn
   listener_arn                       = module.alb.https_listener_arn
   region                             = var.region
   worker_image                       = var.worker_image
   user_image                         = var.user_image
   messages_image                     = var.messages_image
   recruiting_image                   = var.recruiting_image
+  clan_data_image                    = var.clan_data_image
   chat_table_arn                     = module.chat.chat_table_arn
   app_env_arn                        = module.secrets.app_env_arn
   database_url_arn                   = module.secrets.database_url_arn
@@ -166,6 +168,11 @@ module "welcome" {
   domain_names    = var.welcome_domain_names
   certificate_arn = var.welcome_certificate_arn
   web_acl_id      = null
+}
+
+module "ecr" {
+  source   = "../../modules/ecr"
+  app_name = var.app_name
 }
 
 module "ecr_cleanup" {
