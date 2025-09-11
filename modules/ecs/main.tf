@@ -1,4 +1,10 @@
+# Valid Fargate CPU/Memory pairs
 
+# - cpu 256: memory 512, 1024, 2048
+# - cpu 512: memory 1024–4096 (1 GiB steps)
+# - cpu 1024: memory 2048–8192 (1 GiB steps)
+# - cpu 2048: memory 4096–16384 (1 GiB steps)
+# - cpu 4096: memory 8192–30720 (1 GiB steps)
 
 resource "aws_security_group" "ecs" {
   name        = "${var.app_name}-ecs-sg"
@@ -392,8 +398,8 @@ resource "aws_ecs_task_definition" "messages" {
   family                   = "${var.app_name}-messages"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "512"
+  memory                   = "1024"
   runtime_platform {
     cpu_architecture        = "ARM64"
     operating_system_family = "LINUX"
@@ -696,11 +702,11 @@ resource "aws_ecs_task_definition" "recruiting" {
         },
         {
           name      = "COC_EMAIL"
-          valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_EMAIL::"
+          valueFrom = var.coc_email_arn
         },
         {
           name      = "COC_PASSWORD"
-          valueFrom = "arn:aws:secretsmanager:us-east-1:660170479310:secret:all-env/coc-api-access-1sBKxO:COC_PASSWORD::"
+          valueFrom = var.coc_password_arn
         }
       ]
     }
