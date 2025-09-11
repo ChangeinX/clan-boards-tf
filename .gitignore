@@ -43,3 +43,4 @@ terraform.rc
 *.pem
 
 scripts/.env_state/*
+.terraform.lock.hcl
